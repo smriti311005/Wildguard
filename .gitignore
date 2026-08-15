@@ -7,6 +7,7 @@ dataset/test/
 dataset/train/
 dataset/valid/
 *.cache
+*.db
 
 # ==========================================
 # 2. BASE DOWNLOADED PRE-TRAINED MODELS

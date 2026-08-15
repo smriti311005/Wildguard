@@ -1,4 +1,4 @@
-path: c:\Users\Keshav Vinit Agarwal\OneDrive\Desktop\sih\dataset
+path: ./dataset
 train: images/train
 val: images/valid
 test: images/test
