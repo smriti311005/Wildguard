@@ -1,0 +1,22 @@
+path: c:\Users\Keshav Vinit Agarwal\OneDrive\Desktop\sih\dataset
+train: images/train
+val: images/valid
+test: images/test
+nc: 16
+names:
+- Zebra
+- Lion
+- Leopard
+- Cheetah
+- Tiger
+- Bear
+- Bull
+- Elephant
+- Horse
+- Fox
+- Kangaroo
+- Deer
+- Hippopotamus
+- BrownBear
+- Rhinoceros
+- Jaguar
