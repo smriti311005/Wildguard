@@ -1,9 +1,11 @@
 /**
  * WildCare Frontend API Client
- * Interfaces seamlessly with the FastAPI backend at http://localhost:8000
+ * In production, VITE_API_URL is set to the Render backend URL.
+ * In development, falls back to http://localhost:8000
  */
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 
 // Token Storage Helper
 export const getAuthToken = () => {
