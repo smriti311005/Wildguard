@@ -10,6 +10,18 @@ from ultralytics import YOLO
 # ==========================================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(BASE_DIR)
+FRONTEND_ASSETS = os.path.join(
+    PROJECT_ROOT,
+    "frontend",
+    "assets"
+)
+
+os.makedirs(FRONTEND_ASSETS, exist_ok=True)
+
+LATEST_FRAME_PATH = os.path.join(
+    FRONTEND_ASSETS,
+    "latest_detection.jpg"
+)
 CUSTOM_MODEL_PATH = os.path.join(PROJECT_ROOT, 'SIH_Wildlife', 'edge_prototype', 'weights', 'best.pt')
 
 WILDLIFE_CONF = 0.55   # Wildlife confidence threshold
@@ -116,11 +128,25 @@ while True:
         except Exception as e:
             print(f">> [WARNING] Could not reach Cloud Backend: {e}")
 
-    cv2.imshow("Wildlife Edge AI - Live Feed", frame)
+        # Save latest annotated frame for the Streamlit dashboard
+    cv2.imwrite(
+        LATEST_FRAME_PATH,
+        frame
+    )
 
+    # Show live Edge AI feed
+    cv2.imshow(
+        "Wildlife Edge AI - Live Feed",
+        frame
+    )
+
+    # Quit when 'q' is pressed
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
+
+# Release resources after loop
 cap.release()
 cv2.destroyAllWindows()
+
 print("[INFO] System shutdown complete.")
