@@ -1,7 +1,8 @@
 fastapi
 uvicorn[standard]
-pydantic
+pydantic[email]
 sqlalchemy
+bcrypt
 streamlit
 pandas
 requests
@@ -12,4 +13,4 @@ pillow
 ultralytics
 scikit-learn
 opencv-python
-
+python-multipart
