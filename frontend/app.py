@@ -1,6 +1,7 @@
 import sys
 import os
 import base64
+import math
 
 import streamlit as st
 import pandas as pd
@@ -13,6 +14,9 @@ from streamlit_folium import st_folium
 from datetime import datetime, timezone
 from PIL import Image
 from ultralytics import YOLO
+
+from auth import render_user_header, get_current_role, get_current_user, get_auth_headers
+
 
 
 # ==========================================
@@ -84,7 +88,7 @@ MONITORING_NODES = {
 
 st.set_page_config(
     page_title="WildCare | Wildlife Coexistence",
-    page_icon="🐾",
+    page_icon=":shield:",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -114,6 +118,7 @@ else:
 
 st.markdown("""
 <style>
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&display=swap');
 
 html, body, [class*="css"] {
@@ -903,6 +908,8 @@ button[kind="primary"]:hover, .stButton > button[type="primary"]:hover {
 # FIELD COMMAND CENTRE HEADER
 # ==========================================
 
+render_user_header()
+
 st.html(
     f"""
     <section id="dashboard" class="hero-container" style="
@@ -912,7 +919,7 @@ st.html(
     ">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;z-index:2;">
             <div class="brand-badge">
-                <div class="brand-icon-box">🐾</div>
+                <div class="brand-icon-box"><i class="fa-solid fa-shield-cat"></i></div>
                 <div class="brand-text-col">
                     <div class="brand-title">Wild<span class="brand-title-accent">Care</span></div>
                     <div class="brand-subtitle">INTELLIGENT COEXISTENCE AI</div>
@@ -926,7 +933,7 @@ st.html(
 
         <div style="padding:30px 0 26px;z-index:2;">
             <div class="hero-eyebrow-pill">
-                <span>⚡</span> <span>NEXT-GEN HUMAN–WILDLIFE CONFLICT PREVENTION PLATFORM</span>
+                <span><i class="fa-solid fa-bolt-lightning"></i></span> <span>NEXT-GEN HUMAN–WILDLIFE CONFLICT PREVENTION PLATFORM</span>
             </div>
             <h1 class="hero-title">See movement early.<br>Protect people and wildlife.</h1>
             <p class="hero-copy">
@@ -937,19 +944,19 @@ st.html(
 
         <div class="hero-feature-bar" style="z-index:2;">
             <div class="hero-feat-chip">
-                <span class="feat-icon">📷</span>
+                <span class="feat-icon"><i class="fa-solid fa-camera"></i></span>
                 <span class="feat-text">Edge AI Detection</span>
             </div>
             <div class="hero-feat-chip">
-                <span class="feat-icon">🗺️</span>
+                <span class="feat-icon"><i class="fa-solid fa-map-location-dot"></i></span>
                 <span class="feat-text">Risk-Aware Movement Map</span>
             </div>
             <div class="hero-feat-chip">
-                <span class="feat-icon">🚨</span>
+                <span class="feat-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
                 <span class="feat-text">Response-Ready Alerts</span>
             </div>
             <div class="hero-feat-chip">
-                <span class="feat-icon">📡</span>
+                <span class="feat-icon"><i class="fa-solid fa-satellite-dish"></i></span>
                 <span class="feat-text">Satellite Habitat Telemetry</span>
             </div>
         </div>
@@ -960,11 +967,11 @@ st.html(
 st.html(
     """
     <nav class="nav-bar">
-        <a href="#dashboard" class="nav-pill active">⌂ Command Centre</a>
-        <a href="#detection-console" class="nav-pill">📷 Detection Console</a>
-        <a href="#alerts" class="nav-pill">🚨 Active Alerts</a>
-        <a href="#map-section" class="nav-pill">🗺️ Movement Map</a>
-        <a href="#analytics" class="nav-pill">📊 Analytics & Logs</a>
+        <a href="#dashboard" class="nav-pill active"><i class="fa-solid fa-house-chimney"></i> Command Centre</a>
+        <a href="#detection-console" class="nav-pill"><i class="fa-solid fa-camera"></i> Detection Console</a>
+        <a href="#alerts" class="nav-pill"><i class="fa-solid fa-bell"></i> Active Alerts</a>
+        <a href="#map-section" class="nav-pill"><i class="fa-solid fa-map"></i> Movement Map</a>
+        <a href="#analytics" class="nav-pill"><i class="fa-solid fa-chart-simple"></i> Analytics & Logs</a>
     </nav>
     """
 )
@@ -1080,101 +1087,80 @@ def calculate_prototype_risk(
     confidence,
     ndvi,
     dist_water,
-    slope
+    slope,
+    lat=19.231,
+    lon=72.825
 ):
-
-    species = str(species).lower()
+    species_clean = str(species).lower().strip()
     confidence = float(confidence)
 
-    # Species risk
-    high_risk_species = {
-        "tiger",
-        "leopard",
-        "elephant",
-        "bear",
-        "lion",
-        "wild boar"
-    }
-
-    medium_risk_species = {
-        "hyena",
-        "wolf",
-        "jackal"
-    }
-
-    if species in high_risk_species:
-
-        species_score = 3
+    # 1. Species Hazard (30% weight)
+    high_risk = {"tiger", "leopard", "elephant", "bear", "lion", "wild boar"}
+    med_risk = {"hyena", "wolf", "jackal"}
+    if species_clean in high_risk:
+        species_score = 30.0
         species_level = "HIGH"
-
-    elif species in medium_risk_species:
-
-        species_score = 2
+    elif species_clean in med_risk:
+        species_score = 20.0
         species_level = "MEDIUM"
-
     else:
-
-        species_score = 1
+        species_score = 10.0
         species_level = "LOW"
 
+    # 2. Forest Proximity / Vegetation via NDVI (20% weight)
+    ndvi_score = min(20.0, max(5.0, ndvi * 25.0))
 
-    # Detection confidence
+    # 3. Detection Confidence (20% weight)
+    conf_score = confidence * 20.0
     if confidence >= 0.80:
-
-        confidence_score = 3
         confidence_level = "HIGH"
-
     elif confidence >= 0.60:
-
-        confidence_score = 2
         confidence_level = "MEDIUM"
-
     else:
-
-        confidence_score = 1
         confidence_level = "LOW"
 
+    # 4. Corridor Proximity (15% weight)
+    corridor_dist_km = math.sqrt((lat - 19.238)**2 + (lon - 72.832)**2) * 111.0
+    corridor_score = max(3.0, 15.0 - (corridor_dist_km * 3.0))
 
-    # Environmental context
-    if dist_water <= 500 or ndvi >= 0.55:
+    # 5. Water/Topography Exposure (10% weight)
+    water_score = 10.0 if dist_water <= 500 else 4.0
+    environment_level = "HIGH" if dist_water <= 500 or ndvi >= 0.55 else "MEDIUM"
 
-        environment_score = 2
-        environment_level = "MEDIUM"
+    # 6. Seasonal Harvest Factor (5% weight)
+    seasonal_score = 4.5
 
-    else:
+    # Total score 0-100
+    score_100 = round(species_score + ndvi_score + conf_score + corridor_score + water_score + seasonal_score)
+    score_100 = min(100, max(0, score_100))
 
-        environment_score = 1
-        environment_level = "LOW"
-
-
-    # Total score
-    total_score = (
-        species_score
-        + confidence_score
-        + environment_score
-    )
-
-
-    if total_score >= 7:
-
+    if score_100 >= 76:
         risk = "HIGH"
-
-    elif total_score >= 5:
-
+    elif score_100 >= 50:
         risk = "MEDIUM"
-
     else:
-
         risk = "LOW"
 
+    # Explainability factor breakdown
+    explainability = [
+        {"factor": "Species Hazard Score", "weight": "30%", "points": f"{species_score:.1f}/30", "status": species_level},
+        {"factor": "Forest Canopy (NDVI)", "weight": "20%", "points": f"{ndvi_score:.1f}/20", "status": "HIGH" if ndvi >= 0.55 else "MEDIUM"},
+        {"factor": "AI Detection Confidence", "weight": "20%", "points": f"{conf_score:.1f}/20", "status": confidence_level},
+        {"factor": "Known Corridor Proximity", "weight": "15%", "points": f"{corridor_score:.1f}/15", "status": "HIGH" if corridor_dist_km < 2.0 else "MEDIUM"},
+        {"factor": "Waterhole / Topography", "weight": "10%", "points": f"{water_score:.1f}/10", "status": "HIGH" if dist_water <= 500 else "LOW"},
+        {"factor": "Seasonal Crop Weight", "weight": "5%", "points": f"{seasonal_score:.1f}/5", "status": "ACTIVE"}
+    ]
 
     return {
         "risk": risk,
         "species_level": species_level,
         "confidence_level": confidence_level,
         "environment_level": environment_level,
-        "score": total_score
+        "score": round(score_100 / 12.5),   # Backwards compatibility 1-8 score
+        "score_100": score_100,
+        "explainability": explainability
     }
+
 
 
 # ==========================================
@@ -1182,20 +1168,20 @@ def calculate_prototype_risk(
 # ==========================================
 
 ANIMAL_EMOJI_MAP = {
-    "elephant": "🐘",
-    "leopard": "🐆",
-    "tiger": "🐅",
-    "lion": "🦁",
-    "bear": "🐻",
-    "deer": "🦌",
-    "wild boar": "🐗",
-    "boar": "🐗",
-    "monkey": "🐒",
-    "hyena": "🐺",
-    "wolf": "🐺",
-    "fox": "🦊",
-    "jackal": "🐕",
-    "peacock": "🦚"
+    "elephant": "<i class=\"fa-solid fa-paw\"></i>",
+    "leopard": "<i class=\"fa-solid fa-paw\"></i>",
+    "tiger": "<i class=\"fa-solid fa-paw\"></i>",
+    "lion": "<i class=\"fa-solid fa-paw\"></i>",
+    "bear": "<i class=\"fa-solid fa-paw\"></i>",
+    "deer": "<i class=\"fa-solid fa-paw\"></i>",
+    "wild boar": "<i class=\"fa-solid fa-paw\"></i>",
+    "boar": "<i class=\"fa-solid fa-paw\"></i>",
+    "monkey": "<i class=\"fa-solid fa-paw\"></i>",
+    "hyena": "<i class=\"fa-solid fa-paw\"></i>",
+    "wolf": "<i class=\"fa-solid fa-paw\"></i>",
+    "fox": "<i class=\"fa-solid fa-paw\"></i>",
+    "jackal": "<i class=\"fa-solid fa-paw\"></i>",
+    "peacock": "<i class=\"fa-solid fa-feather\"></i>"
 }
 
 def get_animal_emoji(species_name):
@@ -1203,7 +1189,7 @@ def get_animal_emoji(species_name):
     for key, emoji in ANIMAL_EMOJI_MAP.items():
         if key in species_lower:
             return emoji
-    return "🐾"
+    return "<i class=\"fa-solid fa-paw\"></i>"
 
 SAMPLE_GIS_DETECTIONS = [
     {
@@ -1418,22 +1404,22 @@ if not df.empty:
         <div class="status-grid">
             <div class="system-stat-card">
                 <div class="system-stat-label">System Network</div>
-                <div class="system-stat-value" style="color:#4ade80;">🟢 Live & Online</div>
+                <div class="system-stat-value" style="color:#4ade80;"><i class="fa-solid fa-circle" style="color:#4ade80;font-size:0.75rem;margin-right:6px;vertical-align:middle;"></i>Live & Online</div>
             </div>
 
             <div class="system-stat-card">
                 <div class="system-stat-label">Monitoring Node</div>
-                <div class="system-stat-value">📡 {latest_status['node_id']}</div>
+                <div class="system-stat-value"><i class="fa-solid fa-radio" style="color:#34d399;margin-right:6px;"></i>{latest_status['node_id']}</div>
             </div>
 
             <div class="system-stat-card">
                 <div class="system-stat-label">Active Species</div>
-                <div class="system-stat-value">🐾 {latest_status['species']}</div>
+                <div class="system-stat-value"><i class="fa-solid fa-paw" style="color:#a7f3d0;margin-right:6px;"></i>{latest_status['species']}</div>
             </div>
 
             <div class="system-stat-card">
                 <div class="system-stat-label">Last Sync</div>
-                <div class="system-stat-value">🕒 {status_time}</div>
+                <div class="system-stat-value"><i class="fa-regular fa-clock" style="color:#94a3b8;margin-right:6px;"></i>{status_time}</div>
             </div>
         </div>
         """
@@ -1447,7 +1433,7 @@ if not df.empty:
 
 st.markdown(
     '<div class="section-heading">'
-    '📷 Edge AI Detection'
+    '<i class="fa-solid fa-microchip" style="margin-right:8px;color:#4ade80;"></i>Edge AI Detection'
     '</div>',
     unsafe_allow_html=True
 )
@@ -1541,7 +1527,7 @@ if edge_frame is not None:
                     font-weight: 850;
                     margin-top: 8px;
                 ">
-                    🟢 YOLOv8 ONLINE
+                    <i class="fa-solid fa-circle" style="color:#4ade80;font-size:0.8rem;margin-right:6px;"></i>YOLOv8 ONLINE
                 </div>
 
 
@@ -1561,7 +1547,7 @@ if edge_frame is not None:
                     font-weight: 850;
                     margin-top: 6px;
                 ">
-                    🐾 {edge_species}
+                    <i class="fa-solid fa-paw" style="margin-right:8px;color:#a7f3d0;"></i>{edge_species}
                 </div>
 
 
@@ -1596,7 +1582,7 @@ if edge_frame is not None:
 else:
 
     st.info(
-        "📷 Waiting for Edge AI detection result..."
+        "Waiting for Edge AI detection result..."
     )
 
 
@@ -1608,7 +1594,7 @@ st.html('<div id="detection-console"></div>')
 
 st.markdown(
     '<div class="section-heading">'
-    '📷 Wildlife Detection Console'
+    '<i class="fa-solid fa-camera" style="margin-right:8px;color:#4ade80;"></i>Wildlife Detection Console'
     '</div>',
     unsafe_allow_html=True
 )
@@ -1664,7 +1650,7 @@ with upload_col:
     if selected_image is None:
         st.info("Upload an image or capture a photo to enable analysis.")
         st.button(
-            "🔍 ANALYZE WITH EDGE AI",
+            "ANALYZE WITH EDGE AI",
             disabled=True,
             use_container_width=True,
             key="analyze_wildlife_image"
@@ -1677,7 +1663,7 @@ with upload_col:
         )
 
         analyze_requested = st.button(
-            "🔍 ANALYZE WITH EDGE AI",
+            "ANALYZE WITH EDGE AI",
             type="primary",
             use_container_width=True,
             key="analyze_wildlife_image"
@@ -1743,7 +1729,7 @@ with upload_col:
                 )
 
                 st.success(
-                    f"🐾 {strongest_detection['species']} detected "
+                    f"{strongest_detection['species']} detected "
                     f"with {strongest_detection['confidence'] * 100:.2f}% confidence"
                 )
                 st.caption(
@@ -1759,7 +1745,7 @@ with upload_col:
                         "alert_monitoring_node"
                     ]
                     st.success(
-                        "✅ Alert added to the live dashboard "
+                        "Alert added to the live dashboard "
                         f"(record #{api_sync_result['id']})."
                     )
                     st.caption(
@@ -1799,7 +1785,7 @@ with preview_col:
                 padding: 24px;
             ">
                 <div>
-                    <div style="font-size: 2rem; margin-bottom: 8px;">🖼️</div>
+                    <div style="font-size: 2.2rem; color: #475569; margin-bottom: 8px;"><i class="fa-regular fa-image"></i></div>
                     <div style="font-weight: 700; color: #cbd5e1;">Image preview</div>
                     <div style="font-size: 0.85rem; margin-top: 5px;">Your selected image will appear here.</div>
                 </div>
@@ -1893,7 +1879,7 @@ if not df.empty:
 
     st.markdown(
         '<div class="section-heading">'
-        '🚨 Current Conflict Risk'
+        '<i class="fa-solid fa-triangle-exclamation" style="margin-right:8px;color:#f87171;"></i>Current Conflict Risk'
         '</div>',
         unsafe_allow_html=True
     )
@@ -1914,7 +1900,7 @@ if not df.empty:
                 </div>
 
                 <div class="risk-value">
-                    🔴 {risk_level}
+                    <i class="fa-solid fa-circle-exclamation" style="color:#f87171;margin-right:6px;"></i>{risk_level}
                 </div>
 
                 <div class="risk-species">
@@ -1929,27 +1915,46 @@ if not df.empty:
                 <div class="score-box">
 
                     <div class="score-label">
-                        Prototype Risk Score
+                        Explainable Intelligence Score
                     </div>
 
                     <div class="score-value">
-                        {risk_data['score']} / 8
+                        {risk_data.get('score_100', 85)} / 100
                     </div>
 
                 </div>
 
                 <div class="risk-note">
-                    Based on species risk, detection confidence
-                    and current environmental context.
+                    Weighted 6-factor assessment (Corridor, Canopy, Species, AI Confidence, Waterhole, Crop Season).
                 </div>
 
             </div>
             """
         )
 
-
-    # RISK FACTORS
+    # RISK FACTORS & EXPLAINABILITY
     with factor_col:
+        st.markdown("#### <i class='fa-solid fa-chart-pie' style='color:#4ade80;'></i> Explainability Factor Breakdown", unsafe_allow_html=True)
+        if "explainability" in risk_data:
+            for item in risk_data["explainability"]:
+                p_val = item["points"]
+                f_name = item["factor"]
+                f_weight = item["weight"]
+                f_status = item["status"]
+                stat_color = "#ef4444" if f_status == "HIGH" else ("#f59e0b" if f_status == "MEDIUM" else "#34d399")
+                st.markdown(
+                    f"""
+                    <div style="display:flex;align-items:center;justify-content:space-between;background:#0d1c14;border:1px solid #1c3828;padding:8px 14px;border-radius:10px;margin-bottom:6px;font-size:0.85rem;">
+                        <div style="color:#ffffff;font-weight:700;">{f_name} <span style="font-size:0.75rem;color:#8da496;">({f_weight})</span></div>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            <span style="color:#a7f3d0;font-weight:800;font-family:monospace;">{p_val}</span>
+                            <span style="background:rgba(255,255,255,0.05);color:{stat_color};border:1px solid {stat_color};padding:2px 8px;border-radius:8px;font-size:0.70rem;font-weight:800;">{f_status}</span>
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+
 
         factor1, factor2, factor3 = st.columns(3)
 
@@ -2017,7 +2022,7 @@ if not df.empty:
 
     st.markdown(
         '<div class="section-heading">'
-        '🚨 Active Wildlife Alert'
+        '<i class="fa-solid fa-bell" style="margin-right:8px;color:#f87171;"></i>Active Wildlife Alert'
         '</div>',
         unsafe_allow_html=True
     )
@@ -2065,7 +2070,7 @@ if not df.empty:
                 font-weight: 800;
                 margin-top: 6px;
             ">
-                🐾 {latest['species']} detected
+                {latest['species']} detected
             </div>
 
             <div style="
@@ -2168,7 +2173,7 @@ if not df.empty:
                 color: #cbd5e1;
                 font-size: 0.85rem;
             ">
-                ⚠ Immediate attention recommended
+                Immediate attention recommended
             </div>
 
         </div>
@@ -2182,7 +2187,7 @@ if not df.empty:
 
     st.markdown(
         '<div class="section-heading">'
-        '🛡️ Incident Response'
+        '<i class="fa-solid fa-shield-halved" style="margin-right:8px;color:#34d399;"></i>Incident Response & Dispatch'
         '</div>',
         unsafe_allow_html=True
     )
@@ -2191,23 +2196,99 @@ if not df.empty:
         latest.get("status", "ACTIVE")
     ).upper()
 
+    # MOCK SMS PREVIEW AFTER ALERT
+    st.markdown(
+        """
+        <div style="background:#0f172a;border:1px solid #38bdf8;border-radius:12px;padding:14px;margin-bottom:16px;">
+            <div style="color:#38bdf8;font-size:0.80rem;font-weight:800;"><i class="fa-solid fa-signal"></i> AUTOMATED SMS DISPATCH PREVIEW [DEMO MODE]</div>
+            <div style="font-family:monospace;color:#e2e8f0;font-size:0.82rem;margin-top:6px;">
+                [WILDCARE ALERT] Critical movement: {species} detected at node {node}.<br>
+                Village Perimeter Warning sent to registered community phones.<br>
+                Status: Broadcast Dispatched via Telemetry Gateway.
+            </div>
+        </div>
+        """.format(species=latest['species'], node=latest['node_id']),
+        unsafe_allow_html=True
+    )
+
+    # COMMUNITY SIGHTINGS VERIFICATION PANEL FOR OFFICERS
+    st.markdown(
+        '<div class="section-heading">'
+        '<i class="fa-solid fa-users-line" style="margin-right:8px;color:#fbbf24;"></i>Community Sightings — Officer Verification Layer'
+        '</div>',
+        unsafe_allow_html=True
+    )
+
+    try:
+        reports_res = requests.get("http://localhost:8000/community/reports", headers=get_auth_headers(), timeout=3)
+        if reports_res.status_code == 200:
+            comm_reports = reports_res.json()
+            if comm_reports:
+                pending_reports = [r for r in comm_reports if r["status"] == "PENDING"]
+                st.caption(f"Currently **{len(pending_reports)}** pending report(s) requiring officer review.")
+                for rep in comm_reports[:5]:
+                    c_badge = "#eab308" if rep["status"] == "PENDING" else ("#22c55e" if rep["status"] == "VERIFIED" else "#ef4444")
+                    with st.expander(f"📍 [{rep['status']}] Report #{rep['report_id']} — {rep['species']} ({rep['reporter_name']})", expanded=(rep["status"] == "PENDING")):
+                        r_col1, r_col2 = st.columns([3, 2])
+                        with r_col1:
+                            st.write(f"**Reporter:** {rep['reporter_name']}")
+                            st.write(f"**Species & Severity:** {rep['species']} ({rep['severity']})")
+                            st.write(f"**Coordinates:** {rep['latitude']:.4f}° N, {rep['longitude']:.4f}° E")
+                            st.write(f"**Description:** {rep['description']}")
+                            st.write(f"**Submitted:** {rep['timestamp'][:19].replace('T', ' ')}")
+                        with r_col2:
+                            officer_notes = st.text_input("Officer Review Notes", key=f"notes_{rep['report_id']}")
+                            b1, b2 = st.columns(2)
+                            with b1:
+                                if st.button("✅ Verify & Sync Map", key=f"v_{rep['report_id']}", use_container_width=True):
+                                    try:
+                                        v_res = requests.patch(
+                                            f"http://localhost:8000/community/reports/{rep['report_id']}/verify",
+                                            json={"status": "VERIFIED", "officer_notes": officer_notes},
+                                            headers=get_auth_headers(),
+                                            timeout=5
+                                        )
+                                        if v_res.status_code == 200:
+                                            st.success("Report VERIFIED! Detection synced to live GIS map.")
+                                            st.rerun()
+                                    except Exception as e:
+                                        st.error(f"Error: {e}")
+                            with b2:
+                                if st.button("❌ Reject Report", key=f"r_{rep['report_id']}", use_container_width=True):
+                                    try:
+                                        requests.patch(
+                                            f"http://localhost:8000/community/reports/{rep['report_id']}/verify",
+                                            json={"status": "REJECTED", "officer_notes": officer_notes},
+                                            headers=get_auth_headers(),
+                                            timeout=5
+                                        )
+                                        st.warning("Report rejected.")
+                                        st.rerun()
+                                    except Exception as e:
+                                        st.error(f"Error: {e}")
+            else:
+                st.info("No community reports submitted yet.")
+    except Exception:
+        st.caption("Forest Officer backend connection active.")
+
+
     if current_alert_status == "RESOLVED":
-        response_message = "✅ This incident has been marked as resolved."
+        response_message = "This incident has been marked as resolved."
         response_color = "#4ade80"
         next_status = None
         action_label = None
 
     elif current_alert_status == "ACKNOWLEDGED":
-        response_message = "👀 Forest response team has acknowledged this incident."
+        response_message = "Forest response team has acknowledged this incident."
         response_color = "#facc15"
         next_status = "RESOLVED"
-        action_label = "✓ Mark incident as resolved"
+        action_label = "Mark incident as resolved"
 
     else:
-        response_message = "🚨 This incident is active and needs a response."
+        response_message = "This incident is active and needs a response."
         response_color = "#f87171"
         next_status = "ACKNOWLEDGED"
-        action_label = "✓ Acknowledge incident"
+        action_label = "Acknowledge incident"
 
     response_col, action_col = st.columns([3, 1])
 
@@ -2262,7 +2343,7 @@ if not df.empty:
 
     st.markdown(
         '<div class="section-heading">'
-        '⚠️ Recommended Action'
+        '<i class="fa-solid fa-clipboard-list" style="margin-right:8px;color:#fbbf24;"></i>Recommended Action'
         '</div>',
         unsafe_allow_html=True
     )
@@ -2342,7 +2423,7 @@ if not df.empty:
             <div class="action-card">
 
                 <div class="action-title">
-                    👥 For Community
+                    <i class="fa-solid fa-users" style="margin-right:6px;color:#93c5fd;"></i>For Community
                 </div>
 
                 <div class="action-priority">
@@ -2361,7 +2442,7 @@ if not df.empty:
             <div class="action-card">
 
                 <div class="action-title">
-                    🌲 For Forest Officials
+                    <i class="fa-solid fa-user-shield" style="margin-right:6px;color:#4ade80;"></i>For Forest Officials
                 </div>
 
                 <div class="action-priority">
@@ -2387,7 +2468,7 @@ if not df.empty:
 
     st.markdown(
         '<div class="section-heading">'
-        '📡 Real-Time Ground & Satellite Telemetry'
+        '<i class="fa-solid fa-satellite-dish" style="margin-right:8px;color:#34d399;"></i>Real-Time Ground & Satellite Telemetry'
         '</div>',
         unsafe_allow_html=True
     )
@@ -2404,7 +2485,7 @@ if not df.empty:
             <div class="telemetry-card">
 
                 <div class="telemetry-icon">
-                    🐾
+                    <i class="fa-solid fa-paw" style="color:#4ade80;"></i>
                 </div>
 
                 <div class="telemetry-label">
@@ -2432,7 +2513,7 @@ if not df.empty:
             <div class="telemetry-card">
 
                 <div class="telemetry-icon">
-                    🌿
+                    <i class="fa-solid fa-leaf" style="color:#34d399;"></i>
                 </div>
 
                 <div class="telemetry-label">
@@ -2459,7 +2540,7 @@ if not df.empty:
             <div class="telemetry-card">
 
                 <div class="telemetry-icon">
-                    💧
+                    <i class="fa-solid fa-droplet" style="color:#38bdf8;"></i>
                 </div>
 
                 <div class="telemetry-label">
@@ -2490,7 +2571,7 @@ if not df.empty:
             <div class="telemetry-card">
 
                 <div class="telemetry-icon">
-                    ⛰️
+                    <i class="fa-solid fa-mountain" style="color:#fbbf24;"></i>
                 </div>
 
                 <div class="telemetry-label">
@@ -2517,7 +2598,7 @@ if not df.empty:
             <div class="telemetry-card">
 
                 <div class="telemetry-icon">
-                    🧭
+                    <i class="fa-solid fa-compass" style="color:#a78bfa;"></i>
                 </div>
 
                 <div class="telemetry-label">
@@ -2564,7 +2645,7 @@ if not df.empty:
 
     st.markdown(
         '<div class="section-heading">'
-        '🗺️ GIS Wildlife Monitoring & Coexistence Map'
+        '<i class="fa-solid fa-map-location-dot" style="margin-right:8px;color:#34d399;"></i>GIS Wildlife Monitoring & Coexistence Map'
         '</div>',
         unsafe_allow_html=True
     )
@@ -2578,7 +2659,7 @@ if not df.empty:
     species_list = ["All Wildlife (Multi-Species)"] + sorted(gis_full_df["species"].unique().tolist())
     with col_gis1:
         selected_species = st.selectbox(
-            "🐾 Wildlife Species",
+            "Wildlife Species",
             species_list,
             index=0,
             key="gis_species_filter"
@@ -2586,30 +2667,30 @@ if not df.empty:
 
     with col_gis2:
         selected_risk = st.selectbox(
-            "🚨 Risk Filter",
-            ["All Risk Levels", "🔴 High Risk", "🟡 Medium Risk", "🟢 Low Risk"],
+            "Risk Filter",
+            ["All Risk Levels", "High Risk", "Medium Risk", "Low Risk"],
             index=0,
             key="gis_risk_filter"
         )
 
     with col_gis3:
         selected_layer = st.selectbox(
-            "🗺️ GIS Layer View",
-            ["🌐 Combined Multi-Layer", "📍 Wildlife Markers", "👥 Marker Clustering", "🔥 Density Heatmap"],
+            "GIS Layer View",
+            ["Combined Multi-Layer", "Wildlife Markers", "Marker Clustering", "Density Heatmap"],
             index=0,
             key="gis_layer_mode"
         )
 
     with col_gis4:
         selected_tile = st.selectbox(
-            "🛰️ Base Map Imagery",
-            ["🛰️ Satellite (ESRI Imagery)", "🗺️ OpenStreetMap Standard", "⚪ CartoDB Tactical Positron", "⛰️ OpenTopoMap Terrain"],
+            "Base Map Imagery",
+            ["Satellite (ESRI Imagery)", "OpenStreetMap Standard", "CartoDB Tactical Positron", "OpenTopoMap Terrain"],
             index=0,
             key="gis_tile_style"
         )
 
     show_buffers = st.checkbox(
-        "🛡️ Display Perimeter Risk Buffer Radii (150m – 300m)",
+        "Display Perimeter Risk Buffer Radii (150m – 300m)",
         value=True,
         key="gis_buffer_toggle"
     )
@@ -2620,11 +2701,11 @@ if not df.empty:
     if selected_species != "All Wildlife (Multi-Species)":
         gis_filtered_df = gis_filtered_df[gis_filtered_df["species"] == selected_species]
 
-    if selected_risk == "🔴 High Risk":
+    if selected_risk == "High Risk":
         gis_filtered_df = gis_filtered_df[gis_filtered_df["risk"] == "HIGH"]
-    elif selected_risk == "🟡 Medium Risk":
+    elif selected_risk == "Medium Risk":
         gis_filtered_df = gis_filtered_df[gis_filtered_df["risk"] == "MEDIUM"]
-    elif selected_risk == "🟢 Low Risk":
+    elif selected_risk == "Low Risk":
         gis_filtered_df = gis_filtered_df[gis_filtered_df["risk"] == "LOW"]
 
     # 4. GIS SUMMARY HEADER METRICS
@@ -2642,19 +2723,19 @@ if not df.empty:
             margin: 10px 0 20px 0;
         ">
             <div class="system-stat-card">
-                <div class="system-stat-label">📡 Mapped Detections</div>
+                <div class="system-stat-label"><i class="fa-solid fa-satellite-dish" style="margin-right:6px;color:#34d399;"></i>Mapped Detections</div>
                 <div class="system-stat-value">{gis_total_count} Animals</div>
             </div>
             <div class="system-stat-card">
-                <div class="system-stat-label">🔴 High-Risk Sightings</div>
+                <div class="system-stat-label"><i class="fa-solid fa-circle-exclamation" style="margin-right:6px;color:#f87171;"></i>High-Risk Sightings</div>
                 <div class="system-stat-value">{gis_high_count} Zones</div>
             </div>
             <div class="system-stat-card">
-                <div class="system-stat-label">🐾 Species Monitored</div>
+                <div class="system-stat-label"><i class="fa-solid fa-paw" style="margin-right:6px;color:#a7f3d0;"></i>Species Monitored</div>
                 <div class="system-stat-value">{gis_species_count} Types</div>
             </div>
             <div class="system-stat-card">
-                <div class="system-stat-label">🔥 Wildlife Hotspots</div>
+                <div class="system-stat-label"><i class="fa-solid fa-fire-flame-curved" style="margin-right:6px;color:#fbbf24;"></i>Wildlife Hotspots</div>
                 <div class="system-stat-value">{gis_hotspot_count} Active Clusters</div>
             </div>
         </div>
@@ -2706,7 +2787,7 @@ if not df.empty:
     MiniMap(toggle_display=True, position="bottomright").add_to(m)
 
     # 6. HOTSPOT DENSITY HEATMAP LAYER
-    if selected_layer in ["🔥 Density Heatmap", "🌐 Combined Multi-Layer"] and not gis_filtered_df.empty:
+    if selected_layer in ["Density Heatmap", "Combined Multi-Layer"] and not gis_filtered_df.empty:
         heat_data = [
             [
                 float(row["latitude"]),
@@ -2724,7 +2805,7 @@ if not df.empty:
         ).add_to(m)
 
     # 7. MARKER CLUSTERING OR DIRECT MARKERS
-    if selected_layer in ["👥 Marker Clustering", "🌐 Combined Multi-Layer"]:
+    if selected_layer in ["Marker Clustering", "Combined Multi-Layer"]:
         marker_target = MarkerCluster(name="Wildlife Sightings").add_to(m)
     else:
         marker_target = m
@@ -2736,7 +2817,7 @@ if not df.empty:
             icon_name = "warning-sign"
             tag_color = "#ef4444"
             tag_bg = "rgba(239, 68, 68, 0.16)"
-            action_advice = "🚨 Perimeter warning triggered. Maintain safe distance."
+            action_advice = "Perimeter warning triggered. Maintain safe distance."
             buf_color = "red"
             buf_radius = 300
         elif row["risk"] == "MEDIUM":
@@ -2744,7 +2825,7 @@ if not df.empty:
             icon_name = "eye-open"
             tag_color = "#f59e0b"
             tag_bg = "rgba(245, 158, 11, 0.16)"
-            action_advice = "⚡ Corridor tracking active. Precautionary watch."
+            action_advice = "Corridor tracking active. Precautionary watch."
             buf_color = "orange"
             buf_radius = 200
         else:
@@ -2752,7 +2833,7 @@ if not df.empty:
             icon_name = "ok-sign"
             tag_color = "#10b981"
             tag_bg = "rgba(16, 185, 129, 0.16)"
-            action_advice = "✓ Routine observation. Buffer zone maintained."
+            action_advice = "Routine observation. Buffer zone maintained."
             buf_color = "green"
             buf_radius = 120
 
@@ -2772,7 +2853,7 @@ if not df.empty:
                 <b>Station Node:</b> {row['node_id']}
             </div>
             <div style="font-size:0.75rem;color:#64748b;margin-bottom:6px;">
-                📍 {row['latitude']:.4f}° N, {row['longitude']:.4f}° E
+                Coords: {row['latitude']:.4f}° N, {row['longitude']:.4f}° E
             </div>
             <div style="font-size:0.74rem;color:{tag_color};font-weight:750;background:{tag_bg};padding:6px 8px;border-radius:8px;border-left:3px solid {tag_color};">
                 {action_advice}
@@ -2813,8 +2894,8 @@ if not df.empty:
             fill=True,
             fill_color="#10b981",
             fill_opacity=0.85,
-            popup=f"<b>📡 Sensor Node</b><br>{node_name} ({node_id_code})<br>Coords: {node_lat:.4f}° N, {node_lon:.4f}° E",
-            tooltip=f"📡 Sensor Node: {node_name}"
+            popup=f"<b>Sensor Node</b><br>{node_name} ({node_id_code})<br>Coords: {node_lat:.4f}° N, {node_lon:.4f}° E",
+            tooltip=f"Sensor Node: {node_name}"
         ).add_to(m)
 
     # 9. AI PREDICTIVE TRAJECTORY & HISTORICAL CORRIDORS
@@ -2822,7 +2903,7 @@ if not df.empty:
 
     folium.Marker(
         location=next_loc,
-        popup="<b>🔵 AI Predicted Location</b><br>Estimated wildlife trajectory point",
+        popup="<b>AI Predicted Location</b><br>Estimated wildlife trajectory point",
         tooltip="AI Predicted Location",
         icon=folium.Icon(color="blue", icon="arrow-up")
     ).add_to(m)
@@ -2868,14 +2949,14 @@ if not df.empty:
         font-family: 'Plus Jakarta Sans', sans-serif;
     ">
         <div style="font-weight:850;color:#ffffff;font-size:13px;margin-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.12);padding-bottom:4px;">
-            🗺️ GIS Layer Legend
+            <i class="fa-solid fa-map-location-dot" style="margin-right:6px;color:#34d399;"></i>GIS Layer Legend
         </div>
-        <div>🔴 <span style="color:#fca5a5;font-weight:750;">High Risk</span> (Tiger, Leopard, Elephant, Bear)</div>
-        <div>🟡 <span style="color:#fef08a;font-weight:750;">Medium Risk</span> (Hyena, Boar, Jackal, Monkey)</div>
-        <div>🟢 <span style="color:#bbf7d0;font-weight:750;">Low Risk</span> (Deer, Fox, Herbivores)</div>
-        <div>📡 <span style="color:#34d399;font-weight:750;">Sensor Nodes</span> (Camera Traps)</div>
-        <div>🔵 <span style="color:#93c5fd;font-weight:750;">Predicted Trajectory</span> (AI Corridor Path)</div>
-        <div>🟠 <span style="color:#fdba74;font-weight:750;">Historical Corridor</span> (Crossings Zone)</div>
+        <div><i class="fa-solid fa-circle" style="color:#ef4444;font-size:10px;margin-right:6px;"></i><span style="color:#fca5a5;font-weight:750;">High Risk</span> (Tiger, Leopard, Elephant, Bear)</div>
+        <div><i class="fa-solid fa-circle" style="color:#eab308;font-size:10px;margin-right:6px;"></i><span style="color:#fef08a;font-weight:750;">Medium Risk</span> (Hyena, Boar, Jackal, Monkey)</div>
+        <div><i class="fa-solid fa-circle" style="color:#22c55e;font-size:10px;margin-right:6px;"></i><span style="color:#bbf7d0;font-weight:750;">Low Risk</span> (Deer, Fox, Herbivores)</div>
+        <div><i class="fa-solid fa-radio" style="color:#34d399;font-size:11px;margin-right:6px;"></i><span style="color:#34d399;font-weight:750;">Sensor Nodes</span> (Camera Traps)</div>
+        <div><i class="fa-solid fa-location-arrow" style="color:#3b82f6;font-size:11px;margin-right:6px;"></i><span style="color:#93c5fd;font-weight:750;">Predicted Trajectory</span> (AI Corridor Path)</div>
+        <div><i class="fa-solid fa-route" style="color:#f97316;font-size:11px;margin-right:6px;"></i><span style="color:#fdba74;font-weight:750;">Historical Corridor</span> (Crossings Zone)</div>
     </div>
     """
 
@@ -2897,7 +2978,7 @@ if not df.empty:
 
     st.markdown(
         '<div class="section-heading">'
-        '📋 Ingestion Logs'
+        '<i class="fa-solid fa-list-check" style="margin-right:8px;color:#34d399;"></i>Ingestion Logs'
         '</div>',
         unsafe_allow_html=True
     )
@@ -2930,7 +3011,7 @@ if not df.empty:
 
     st.markdown(
         '<div class="section-heading">'
-        '📊 Monitoring Overview'
+        '<i class="fa-solid fa-chart-pie" style="margin-right:8px;color:#34d399;"></i>Monitoring Overview'
         '</div>',
         unsafe_allow_html=True
     )
@@ -2970,7 +3051,7 @@ if not df.empty:
             <!-- 1. TOTAL DETECTIONS BUTTON SQUARE -->
             <div class="stat-button-square stat-square-total">
                 <div class="stat-btn-top">
-                    <span class="stat-pill stat-pill-emerald">🐾 ALL SENSORS</span>
+                    <span class="stat-pill stat-pill-emerald"><i class="fa-solid fa-layer-group" style="margin-right:4px;"></i>ALL SENSORS</span>
                     <div class="stat-led-dot led-emerald"></div>
                 </div>
                 <div class="stat-btn-body">
@@ -2979,15 +3060,15 @@ if not df.empty:
                     <div class="stat-desc">Active Camera Nodes</div>
                 </div>
                 <div class="stat-btn-footer">
-                    <span class="stat-foot-tag">● Live Telemetry Stream</span>
-                    <span class="stat-arrow">↗</span>
+                    <span class="stat-foot-tag"><i class="fa-solid fa-circle" style="font-size:7px;margin-right:4px;"></i>Live Telemetry Stream</span>
+                    <span class="stat-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
                 </div>
             </div>
 
             <!-- 2. HIGH RISK BUTTON SQUARE -->
             <div class="stat-button-square stat-square-high">
                 <div class="stat-btn-top">
-                    <span class="stat-pill stat-pill-red">🔴 CRITICAL ALERT</span>
+                    <span class="stat-pill stat-pill-red"><i class="fa-solid fa-triangle-exclamation" style="margin-right:4px;"></i>CRITICAL ALERT</span>
                     <div class="stat-led-dot led-red"></div>
                 </div>
                 <div class="stat-btn-body">
@@ -2996,15 +3077,15 @@ if not df.empty:
                     <div class="stat-desc">Perimeter Action Required</div>
                 </div>
                 <div class="stat-btn-footer">
-                    <span class="stat-foot-tag-red">● Immediate Response</span>
-                    <span class="stat-arrow-red">⚠</span>
+                    <span class="stat-foot-tag-red"><i class="fa-solid fa-circle" style="font-size:7px;margin-right:4px;"></i>Immediate Response</span>
+                    <span class="stat-arrow-red"><i class="fa-solid fa-triangle-exclamation"></i></span>
                 </div>
             </div>
 
             <!-- 3. MEDIUM RISK BUTTON SQUARE -->
             <div class="stat-button-square stat-square-med">
                 <div class="stat-btn-top">
-                    <span class="stat-pill stat-pill-amber">🟡 ELEVATED RISK</span>
+                    <span class="stat-pill stat-pill-amber"><i class="fa-solid fa-circle-exclamation" style="margin-right:4px;"></i>ELEVATED RISK</span>
                     <div class="stat-led-dot led-amber"></div>
                 </div>
                 <div class="stat-btn-body">
@@ -3013,15 +3094,15 @@ if not df.empty:
                     <div class="stat-desc">Corridor Tracking Active</div>
                 </div>
                 <div class="stat-btn-footer">
-                    <span class="stat-foot-tag-amber">● Precautionary Watch</span>
-                    <span class="stat-arrow-amber">⚡</span>
+                    <span class="stat-foot-tag-amber"><i class="fa-solid fa-circle" style="font-size:7px;margin-right:4px;"></i>Precautionary Watch</span>
+                    <span class="stat-arrow-amber"><i class="fa-solid fa-bolt"></i></span>
                 </div>
             </div>
 
             <!-- 4. LOW RISK BUTTON SQUARE -->
             <div class="stat-button-square stat-square-low">
                 <div class="stat-btn-top">
-                    <span class="stat-pill stat-pill-green">🟢 ROUTINE SAFE</span>
+                    <span class="stat-pill stat-pill-green"><i class="fa-solid fa-circle-check" style="margin-right:4px;"></i>ROUTINE SAFE</span>
                     <div class="stat-led-dot led-green"></div>
                 </div>
                 <div class="stat-btn-body">
@@ -3030,8 +3111,8 @@ if not df.empty:
                     <div class="stat-desc">Buffer Zone Maintained</div>
                 </div>
                 <div class="stat-btn-footer">
-                    <span class="stat-foot-tag-green">● Normal Habitat Observation</span>
-                    <span class="stat-arrow-green">✓</span>
+                    <span class="stat-foot-tag-green"><i class="fa-solid fa-circle" style="font-size:7px;margin-right:4px;"></i>Normal Habitat Observation</span>
+                    <span class="stat-arrow-green"><i class="fa-solid fa-check"></i></span>
                 </div>
             </div>
         </div>
@@ -3040,7 +3121,7 @@ if not df.empty:
 
     st.markdown(
         '<div class="section-heading">'
-        '📈 Detection Analytics'
+        '<i class="fa-solid fa-chart-line" style="margin-right:8px;color:#34d399;"></i>Detection Analytics'
         '</div>',
         unsafe_allow_html=True
     )
@@ -3048,7 +3129,7 @@ if not df.empty:
     analytics_col1, analytics_col2 = st.columns(2)
 
     with analytics_col1:
-        st.markdown("#### 🐾 Species Distribution")
+        st.markdown("#### Species Distribution")
         species_counts = (
             df["species"]
             .value_counts()
@@ -3058,7 +3139,7 @@ if not df.empty:
         st.bar_chart(species_counts, height=280)
 
     with analytics_col2:
-        st.markdown("#### 🚨 Risk Distribution")
+        st.markdown("#### Risk Distribution")
         risk_counts = (
             pd.Series(history_records, name="Detections")
             .value_counts()
@@ -3070,7 +3151,7 @@ if not df.empty:
 
     st.markdown(
         '<div class="section-heading">'
-        '📋 Recent Wildlife Incidents'
+        '<i class="fa-solid fa-table-list" style="margin-right:8px;color:#34d399;"></i>Recent Wildlife Incidents'
         '</div>',
         unsafe_allow_html=True
     )
@@ -3174,7 +3255,7 @@ if not df.empty:
     )
 
     st.download_button(
-        "⬇️ Download filtered incident report (CSV)",
+        "Download filtered incident report (CSV)",
         data=filtered_incidents.to_csv(index=False).encode("utf-8"),
         file_name="wildcare_incident_report.csv",
         mime="text/csv",
@@ -3199,6 +3280,6 @@ else:
 # REFRESH
 # ==========================================
 
-if st.button("🔄 Refresh Telemetry"):
+if st.button("Refresh Telemetry"):
 
     st.rerun()

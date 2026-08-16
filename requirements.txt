@@ -2,3 +2,14 @@ fastapi
 uvicorn[standard]
 pydantic
 sqlalchemy
+streamlit
+pandas
+requests
+folium
+numpy
+streamlit-folium
+pillow
+ultralytics
+scikit-learn
+opencv-python
+
