@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { 
-  Eye, 
+  Shield, 
   ShieldCheck, 
   Radio, 
   Camera, 
@@ -15,7 +15,9 @@ import {
   Cpu,
   Layers,
   ChevronRight,
-  Database
+  Database,
+  Bell,
+  HeartHandshake
 } from 'lucide-react';
 
 export default function LandingPage({ 
@@ -33,24 +35,24 @@ export default function LandingPage({
   return (
     <div style={{ color: 'var(--text-primary)', minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#ffffff' }}>
       
-      {/* ─── WILDLIFE INSIGHTS STYLE HEADER & NAVBAR ─── */}
+      {/* ─── NAVBAR ─── */}
       <nav style={{
         position: 'sticky',
         top: 0,
         zIndex: 100,
         background: '#ffffff',
         borderBottom: '1px solid var(--border-subtle)',
-        padding: '16px 24px',
+        padding: '14px 24px',
         boxShadow: '0 1px 3px rgba(0,0,0,0.04)'
       }}>
         <div style={{
-          maxWidth: '1300px',
+          maxWidth: '1280px',
           margin: '0 auto',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between'
         }}>
-          {/* Logo */}
+          {/* Brand Logo */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <div style={{
               width: '36px',
@@ -63,7 +65,7 @@ export default function LandingPage({
               border: '1px solid #c6f6d5',
               color: '#38a169'
             }}>
-              <Eye size={22} color="#38a169" />
+              <Shield size={22} color="#38a169" />
             </div>
             <div>
               <div style={{
@@ -74,27 +76,27 @@ export default function LandingPage({
                 lineHeight: 1.1,
                 color: '#1a202c'
               }}>
-                Wildlife <span style={{ color: '#48bb78' }}>Insights</span>
+                Wild<span style={{ color: '#38a169' }}>Guard</span>
               </div>
             </div>
           </div>
 
           {/* Center Nav Links */}
-          <div style={{ display: 'none', alignItems: 'center', gap: '32px', fontSize: '0.85rem', fontWeight: '800', letterSpacing: '0.5px', textTransform: 'uppercase' }} className="desktop-nav-links">
-            <a href="#capabilities" style={{ color: '#4a5568' }}>Explore Data</a>
-            <a href="#interactive-preview" style={{ color: '#4a5568' }}>Live Platform</a>
-            <a href="#architecture" style={{ color: '#4a5568' }}>Technology</a>
-            <a href="#security" style={{ color: '#4a5568' }}>Community</a>
+          <div style={{ display: 'none', alignItems: 'center', gap: '32px', fontSize: '0.82rem', fontWeight: '800', letterSpacing: '0.5px', textTransform: 'uppercase' }} className="desktop-nav-links">
+            <a href="#overview" style={{ color: '#4a5568', textDecoration: 'none' }}>Overview</a>
+            <a href="#features" style={{ color: '#4a5568', textDecoration: 'none' }}>Features</a>
+            <a href="#tech" style={{ color: '#4a5568', textDecoration: 'none' }}>Technology</a>
+            <a href="#community" style={{ color: '#4a5568', textDecoration: 'none' }}>Community</a>
           </div>
 
           {/* Action CTAs */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {user ? (
               <button 
                 onClick={() => onEnterDashboard()}
                 className="btn btn-primary btn-sm"
               >
-                <span>Dashboard ({user.role})</span>
+                <span>Dashboard ({user.role.replace('_', ' ')})</span>
                 <ArrowRight size={14} />
               </button>
             ) : (
@@ -102,7 +104,7 @@ export default function LandingPage({
                 <button 
                   onClick={() => onOpenAuth('signin')}
                   className="btn btn-secondary btn-sm"
-                  style={{ border: '1px solid #48bb78', color: '#276749', background: '#ffffff' }}
+                  style={{ border: '1px solid #38a169', color: '#276749', background: '#ffffff' }}
                 >
                   Sign In
                 </button>
@@ -119,537 +121,265 @@ export default function LandingPage({
         </div>
       </nav>
 
-      {/* ─── HERO SECTION 01: A QUICKER WAY TO IDENTIFY AND MITIGATE ─── */}
-      <section style={{
-        maxWidth: '1300px',
-        margin: '0 auto',
-        padding: '70px 24px 60px',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-        gap: '48px',
-        alignItems: 'center'
-      }}>
-        <div>
-          <div className="category-tag">
-            UPLOAD & IDENTIFY
-          </div>
-          <h1 style={{
-            fontSize: 'clamp(2.2rem, 4vw, 3.4rem)',
-            fontWeight: '900',
-            lineHeight: 1.12,
-            letterSpacing: '-0.03em',
-            marginBottom: '20px',
-            color: '#1a202c'
-          }}>
-            A Quicker Way to Detect and Protect
-          </h1>
-          <p style={{
-            fontSize: '1.05rem',
-            color: '#4a5568',
-            lineHeight: 1.65,
-            marginBottom: '32px',
-            maxWidth: '520px'
-          }}>
-            Anyone collecting camera trap photos can run real-time YOLOv8 neural detection. Data is fused with Sentinel-2 GIS habitat layers to generate immediate, corridor-scale early warnings for surrounding communities.
-          </p>
-
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px' }}>
-            <button 
-              onClick={() => user ? onEnterDashboard() : onOpenAuth('signup')}
-              className="btn btn-primary"
-              style={{ padding: '13px 28px', fontSize: '0.95rem' }}
-            >
-              <span>Get Started</span>
-            </button>
-            <a 
-              href="#interactive-preview"
-              className="btn btn-secondary"
-              style={{ padding: '13px 24px', fontSize: '0.95rem' }}
-            >
-              <span>Explore Platform</span>
-            </a>
-          </div>
-        </div>
-
-        {/* Camera Trap Grid Graphic (Styled exactly like Wildlife Insights!) */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '12px',
-          padding: '16px',
-          background: '#f8fafc',
-          borderRadius: 'var(--radius-xl)',
-          border: '1px solid var(--border-subtle)',
-          boxShadow: 'var(--shadow-sm)'
-        }}>
-          {/* Tile 1 with green bounding box */}
-          <div style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '2px solid #48bb78', background: '#edfdf5', aspectRatio: '4/3', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: '2.4rem' }}>🐘</span>
-            <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#276749', background: '#c6f6d5', padding: '2px 8px', borderRadius: '4px', marginTop: '4px' }}>
-              Elephant 94%
-            </div>
-          </div>
-
-          <div style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f1f5f9', aspectRatio: '4/3', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: '2.4rem', opacity: 0.7 }}>🐅</span>
-            <div style={{ fontSize: '0.7rem', color: '#718096', marginTop: '4px' }}>Tiger</div>
-          </div>
-
-          <div style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f1f5f9', aspectRatio: '4/3', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: '2.4rem', opacity: 0.7 }}>🐆</span>
-            <div style={{ fontSize: '0.7rem', color: '#718096', marginTop: '4px' }}>Leopard</div>
-          </div>
-
-          <div style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f1f5f9', aspectRatio: '4/3', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: '2.4rem', opacity: 0.7 }}>🐗</span>
-            <div style={{ fontSize: '0.7rem', color: '#718096', marginTop: '4px' }}>Wild Boar</div>
-          </div>
-
-          {/* Tile 5 with green bounding box */}
-          <div style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '2px solid #48bb78', background: '#edfdf5', aspectRatio: '4/3', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: '2.4rem' }}>🦊</span>
-            <div style={{ fontSize: '0.7rem', fontWeight: '800', color: '#276749', background: '#c6f6d5', padding: '2px 8px', borderRadius: '4px', marginTop: '4px' }}>
-              Fox 88%
-            </div>
-          </div>
-
-          <div style={{ position: 'relative', borderRadius: '8px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f1f5f9', aspectRatio: '4/3', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: '2.4rem', opacity: 0.7 }}>🦌</span>
-            <div style={{ fontSize: '0.7rem', color: '#718096', marginTop: '4px' }}>Spotted Deer</div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── HERO SECTION 02: LET A COMPUTER DO THE TAGGING ─── */}
-      <section style={{
-        background: '#f9fafb',
-        borderTop: '1px solid var(--border-subtle)',
-        borderBottom: '1px solid var(--border-subtle)',
-        padding: '80px 24px'
+      {/* ─── HERO SECTION ─── */}
+      <section id="overview" style={{
+        padding: '56px 24px 48px',
+        background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
+        borderBottom: '1px solid #f1f5f9'
       }}>
         <div style={{
-          maxWidth: '1300px',
+          maxWidth: '1280px',
           margin: '0 auto',
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-          gap: '56px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gap: '40px',
           alignItems: 'center'
         }}>
-          {/* Real Live Preview Card */}
-          <div className="glass-panel" style={{
-            padding: '24px',
-            background: '#ffffff',
-            boxShadow: 'var(--shadow-md)'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span className="pulse-beacon"></span>
-                <span style={{ fontSize: '0.78rem', fontWeight: '800', color: '#276749', textTransform: 'uppercase' }}>
-                  Node: Belur-Perimeter-001
-                </span>
-              </div>
-              <span className="badge badge-resolved">● SENTRY ACTIVE</span>
+          {/* Left Text Column */}
+          <div>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '6px 14px',
+              background: '#edfdf5',
+              border: '1px solid #c6f6d5',
+              borderRadius: '999px',
+              fontSize: '0.75rem',
+              fontWeight: '800',
+              color: '#276749',
+              marginBottom: '20px'
+            }}>
+              <span className="live-dot"></span>
+              <span>HUMAN-WILDLIFE COEXISTENCE PLATFORM</span>
             </div>
 
-            <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
-              <div style={{ fontSize: '0.72rem', color: '#718096', fontWeight: '800', textTransform: 'uppercase' }}>
-                Predicted Species Classification
-              </div>
-              <div style={{ fontSize: '1.4rem', fontWeight: '900', color: '#1a202c', marginTop: '2px' }}>
-                {latestAlert ? latestAlert.species : 'Elephant Herd'} (94.0% Confidence)
-              </div>
-              <div style={{ fontSize: '0.8rem', color: '#38a169', marginTop: '2px' }}>
-                Inference Latency: 171.2ms (On-Device Neural)
-              </div>
+            <h1 style={{
+              fontSize: 'clamp(2rem, 4vw, 3.2rem)',
+              fontWeight: '900',
+              lineHeight: 1.1,
+              color: '#1a202c',
+              marginBottom: '20px'
+            }}>
+              Protecting Communities. <br />
+              <span style={{ color: '#38a169' }}>Preserving Wildlife.</span>
+            </h1>
+
+            <p style={{
+              fontSize: 'clamp(0.95rem, 1.5vw, 1.1rem)',
+              color: '#4a5568',
+              lineHeight: 1.6,
+              marginBottom: '28px',
+              maxWidth: '560px'
+            }}>
+              WildGuard combines camera trap AI identification, satellite habitat mapping, and early-warning notifications to prevent human-wildlife conflicts in real time.
+            </p>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '32px' }}>
+              <button 
+                onClick={() => user ? onEnterDashboard() : onOpenAuth('signup')}
+                className="btn btn-primary"
+                style={{ padding: '14px 28px', fontSize: '0.95rem' }}
+              >
+                <span>Launch Operations Console</span>
+                <ArrowRight size={18} />
+              </button>
+
+              <button 
+                onClick={() => user ? onEnterDashboard('detection') : onOpenAuth('signin')}
+                className="btn btn-secondary"
+                style={{ padding: '14px 24px', fontSize: '0.95rem' }}
+              >
+                <Camera size={18} color="#38a169" />
+                <span>Test Camera Classifier</span>
+              </button>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: '0.68rem', color: '#718096', fontWeight: '800' }}>CANOPY DENSITY</div>
-                <div style={{ fontSize: '1.1rem', fontWeight: '900', color: '#1a202c' }}>0.68 NDVI</div>
+            {/* Quick Proof Pills */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px', fontSize: '0.82rem', color: '#718096' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <CheckCircle2 size={16} color="#38a169" />
+                <span>Camera AI Detection</span>
               </div>
-              <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: '0.68rem', color: '#718096', fontWeight: '800' }}>WATER PROXIMITY</div>
-                <div style={{ fontSize: '1.1rem', fontWeight: '900', color: '#1a202c' }}>352 meters</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <CheckCircle2 size={16} color="#38a169" />
+                <span>Satellite GIS Telemetry</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <CheckCircle2 size={16} color="#38a169" />
+                <span>Instant SMS & App Alerts</span>
               </div>
             </div>
           </div>
 
-          <div>
-            <div className="category-tag">
-              IDENTIFY & AUTOMATE
+          {/* Right Showcase Card */}
+          <div className="glass-panel" style={{ padding: '24px', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#e53e3e' }} />
+                <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#1a202c' }}>LIVE INCIDENT FEED</span>
+              </div>
+              <span className="badge badge-active">ACTIVE ALERT</span>
             </div>
-            <h2 style={{
-              fontSize: 'clamp(2rem, 3.5vw, 2.8rem)',
-              fontWeight: '900',
-              lineHeight: 1.15,
-              color: '#1a202c',
-              marginBottom: '18px'
-            }}>
-              Let a Computer do the Tagging
-            </h2>
-            <p style={{
-              fontSize: '1.05rem',
-              color: '#4a5568',
-              lineHeight: 1.65,
-              marginBottom: '28px'
-            }}>
-              Animals in your camera trap photos are automatically identified using fine-tuned machine learning models. Thousands of images can be tagged within minutes, saving you time to do the crucial field work.
-            </p>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
-              <button 
-                onClick={() => user ? onEnterDashboard('detection') : onOpenAuth('signin')}
-                className="btn btn-primary"
-              >
-                <span>About our AI</span>
-              </button>
-              <button 
-                onClick={() => user ? onEnterDashboard('analytics') : onOpenAuth('signin')}
-                className="btn btn-secondary"
-              >
-                <span>AI Performance</span>
-              </button>
+            {/* Sample Alert Display */}
+            <div style={{
+              background: '#fff5f5',
+              border: '1px solid #feb2b2',
+              borderRadius: 'var(--radius-md)',
+              padding: '16px',
+              marginBottom: '16px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <span style={{ fontWeight: '900', fontSize: '1.1rem', color: '#1a202c' }}>
+                  {latestAlert ? latestAlert.species : 'Elephant Herd'}
+                </span>
+                <span style={{ fontWeight: '800', color: '#c53030' }}>
+                  {latestAlert ? `${(latestAlert.confidence * 100).toFixed(0)}% Conf` : '96% Conf'}
+                </span>
+              </div>
+              <div style={{ fontSize: '0.8rem', color: '#4a5568', marginBottom: '8px' }}>
+                Location: <b>Belur Village Perimeter Node</b> (19.231°N, 72.825°E)
+              </div>
+              <div style={{ fontSize: '0.75rem', color: '#718096' }}>
+                Distance to Nearest Farmland: <b>420 meters</b> • Movement Intent: <b>Water Hole Trajectory</b>
+              </div>
+            </div>
+
+            {/* Metric Strip */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', textAlign: 'center' }}>
+              <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#1a202c' }}>4</div>
+                <div style={{ fontSize: '0.68rem', color: '#718096', fontWeight: '700' }}>Active Nodes</div>
+              </div>
+              <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#38a169' }}>98.2%</div>
+                <div style={{ fontSize: '0.68rem', color: '#718096', fontWeight: '700' }}>Accuracy</div>
+              </div>
+              <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                <div style={{ fontSize: '1.2rem', fontWeight: '900', color: '#3182ce' }}>&lt;15s</div>
+                <div style={{ fontSize: '0.68rem', color: '#718096', fontWeight: '700' }}>Alert Time</div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ─── CAPABILITIES (WHAT → HOW → WHY) ─── */}
-      <section id="capabilities" style={{
-        maxWidth: '1300px',
-        margin: '0 auto',
-        padding: '80px 24px'
-      }}>
-        <div style={{ textAlign: 'center', marginBottom: '56px' }}>
-          <div className="category-tag">
-            INTELLIGENT COEXISTENCE CAPABILITIES
-          </div>
-          <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)', fontWeight: '900', color: '#1a202c', marginTop: '4px' }}>
-            Four layers of proactive wildlife defense
+      {/* ─── CAPABILITIES GRID ─── */}
+      <section id="features" style={{ padding: '60px 24px', maxWidth: '1280px', margin: '0 auto', width: '100%' }}>
+        <div style={{ textAlign: 'center', marginBottom: '44px' }}>
+          <div className="category-tag" style={{ marginBottom: '6px' }}>SYSTEM CAPABILITIES</div>
+          <h2 style={{ fontSize: '2rem', fontWeight: '900', color: '#1a202c' }}>
+            Built for Forest Officers & Local Communities
           </h2>
-          <p style={{ color: '#718096', maxWidth: '600px', margin: '8px auto 0', fontSize: '0.95rem' }}>
-            Engineered to eliminate false alarms and give forest officers and rural communities decisive advance notice.
+          <p style={{ fontSize: '0.95rem', color: '#718096', maxWidth: '600px', margin: '8px auto 0' }}>
+            An integrated toolkit providing early warnings, camera trap intelligence, and community incident reports.
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
-          
-          <div className="glass-panel" style={{ padding: '28px 24px' }}>
-            <div className="category-tag">01 // SENTRY VISION</div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#1a202c', marginBottom: '10px' }}>
-              Edge YOLOv8 Neural Sentry
-            </h3>
-            <p style={{ fontSize: '0.88rem', color: '#4a5568', lineHeight: 1.5, marginBottom: '16px' }}>
-              <b>WHAT:</b> Ultra-fast species classification running on camera traps.<br />
-              <b>HOW:</b> On-device inference tags elephants, tigers, and leopards in &lt;180ms.<br />
-              <b>WHY:</b> Delivers immediate alerts without depending on cloud bandwidth.
-            </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#276749', fontWeight: '700' }}>
-              <CheckCircle2 size={15} color="#38a169" />
-              <span>91.5% Validation Accuracy</span>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '24px'
+        }}>
+          {/* Card 1 */}
+          <div className="glass-panel" style={{ padding: '24px' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#edfdf5', border: '1px solid #c6f6d5', color: '#38a169', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+              <Camera size={22} />
             </div>
-          </div>
-
-          <div className="glass-panel" style={{ padding: '28px 24px' }}>
-            <div className="category-tag">02 // SATELLITE GIS</div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#1a202c', marginBottom: '10px' }}>
-              Sentinel-2 GIS Telemetry
-            </h3>
-            <p style={{ fontSize: '0.88rem', color: '#4a5568', lineHeight: 1.5, marginBottom: '16px' }}>
-              <b>WHAT:</b> Vegetation canopy index and terrain slope analysis.<br />
-              <b>HOW:</b> Correlates NDVI greenness, elevation, and water proximity.<br />
-              <b>WHY:</b> Distinguishes safe forest foraging from crop-raiding intent.
+            <h3 style={{ fontSize: '1.15rem', fontWeight: '800', marginBottom: '8px', color: '#1a202c' }}>Camera Trap Classifier</h3>
+            <p style={{ fontSize: '0.85rem', color: '#4a5568', lineHeight: 1.5 }}>
+              Automatic species identification from camera trap snapshot feeds. Detects elephants, leopards, tigers, and wild boars instantly.
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#276749', fontWeight: '700' }}>
-              <CheckCircle2 size={15} color="#38a169" />
-              <span>10m Spatial Resolution</span>
-            </div>
           </div>
 
-          <div className="glass-panel" style={{ padding: '28px 24px' }}>
-            <div className="category-tag">03 // MOVEMENT VECTOR</div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#1a202c', marginBottom: '10px' }}>
-              Predictive Vector Trajectory
-            </h3>
-            <p style={{ fontSize: '0.88rem', color: '#4a5568', lineHeight: 1.5, marginBottom: '16px' }}>
-              <b>WHAT:</b> Random Forest behavioral intent & corridor projection.<br />
-              <b>HOW:</b> Calculates 15-minute advance arrival coordinates.<br />
-              <b>WHY:</b> Gives rangers and villagers actionable reaction time.
+          {/* Card 2 */}
+          <div className="glass-panel" style={{ padding: '24px' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#ebf8ff', border: '1px solid #bee3f8', color: '#3182ce', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+              <MapPin size={22} />
+            </div>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: '800', marginBottom: '8px', color: '#1a202c' }}>GIS Movement Vectors</h3>
+            <p style={{ fontSize: '0.85rem', color: '#4a5568', lineHeight: 1.5 }}>
+              Correlates vegetation density, slope, and water sources to project 15-minute wildlife movement trajectories.
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#276749', fontWeight: '700' }}>
-              <CheckCircle2 size={15} color="#38a169" />
-              <span>15-Minute Advance Notice</span>
-            </div>
           </div>
 
-          <div className="glass-panel" style={{ padding: '28px 24px' }}>
-            <div className="category-tag">04 // DISPATCH</div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: '800', color: '#1a202c', marginBottom: '10px' }}>
-              Autonomous SMS Broadcast
-            </h3>
-            <p style={{ fontSize: '0.88rem', color: '#4a5568', lineHeight: 1.5, marginBottom: '16px' }}>
-              <b>WHAT:</b> Targeted emergency SMS alerts and solar siren activation.<br />
-              <b>HOW:</b> Geo-targeted Kannada/English broadcast to 2.5km radius.<br />
-              <b>WHY:</b> Prevents accidental encounters and protects rural livelihoods.
+          {/* Card 3 */}
+          <div className="glass-panel" style={{ padding: '24px' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#fffaf0', border: '1px solid #fbd38d', color: '#dd6b20', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+              <Users size={22} />
+            </div>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: '800', marginBottom: '8px', color: '#1a202c' }}>Community Sightings</h3>
+            <p style={{ fontSize: '0.85rem', color: '#4a5568', lineHeight: 1.5 }}>
+              Allows villagers to report sightings with 1 tap. Range Forest Officers review and verify reports before broadcasting map warnings.
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem', color: '#276749', fontWeight: '700' }}>
-              <CheckCircle2 size={15} color="#38a169" />
-              <span>Zero Delay Dispatch</span>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ─── INTERACTIVE LIVE DEMO TABS ─── */}
-      <section id="interactive-preview" style={{
-        background: '#f9fafb',
-        borderTop: '1px solid var(--border-subtle)',
-        borderBottom: '1px solid var(--border-subtle)',
-        padding: '70px 24px'
-      }}>
-        <div style={{ maxWidth: '1300px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '36px' }}>
-            <div className="category-tag">LIVE OPERATIONS DEMO</div>
-            <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.4rem)', fontWeight: '900', color: '#1a202c' }}>
-              Explore the Field Dashboard
-            </h2>
-          </div>
-
-          {/* Tab Switcher */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '24px' }}>
-            <button 
-              onClick={() => setActiveFeatureTab('command')}
-              className={`btn btn-sm ${activeFeatureTab === 'command' ? 'btn-primary' : 'btn-secondary'}`}
-            >
-              Command Centre
-            </button>
-            <button 
-              onClick={() => setActiveFeatureTab('detection')}
-              className={`btn btn-sm ${activeFeatureTab === 'detection' ? 'btn-primary' : 'btn-secondary'}`}
-            >
-              YOLOv8 AI Console
-            </button>
-            <button 
-              onClick={() => setActiveFeatureTab('map')}
-              className={`btn btn-sm ${activeFeatureTab === 'map' ? 'btn-primary' : 'btn-secondary'}`}
-            >
-              GIS Movement Map
-            </button>
-          </div>
-
-          {/* Frame */}
-          <div className="glass-panel" style={{ padding: '28px', background: '#ffffff' }}>
-            {activeFeatureTab === 'command' && (
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
-                  <div>
-                    <h4 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#1a202c' }}>Live Tactical Operations View</h4>
-                    <p style={{ fontSize: '0.8rem', color: '#718096' }}>Real-time 6-factor explainability telemetry from field nodes</p>
-                  </div>
-                  <button onClick={() => onEnterDashboard('command')} className="btn btn-primary btn-sm">
-                    <span>Open Full Console</span>
-                    <ExternalLink size={13} />
-                  </button>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
-                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', borderLeft: '4px solid #e53e3e', border: '1px solid #e2e8f0' }}>
-                    <div style={{ fontSize: '0.72rem', color: '#c53030', fontWeight: '800' }}>CURRENT THREAT</div>
-                    <div style={{ fontSize: '1.3rem', fontWeight: '900', color: '#1a202c', marginTop: '2px' }}>Elephant Detected</div>
-                    <div style={{ fontSize: '0.78rem', color: '#718096' }}>Node: Forest-Node-002</div>
-                  </div>
-
-                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', borderLeft: '4px solid #48bb78', border: '1px solid #e2e8f0' }}>
-                    <div style={{ fontSize: '0.72rem', color: '#276749', fontWeight: '800' }}>AI CONFIDENCE</div>
-                    <div style={{ fontSize: '1.3rem', fontWeight: '900', color: '#276749', marginTop: '2px' }}>94.0% Match</div>
-                    <div style={{ fontSize: '0.78rem', color: '#718096' }}>YOLOv8 Sentry Weights</div>
-                  </div>
-
-                  <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', borderLeft: '4px solid #3182ce', border: '1px solid #e2e8f0' }}>
-                    <div style={{ fontSize: '0.72rem', color: '#2b6cb0', fontWeight: '800' }}>CANOPY (NDVI)</div>
-                    <div style={{ fontSize: '1.3rem', fontWeight: '900', color: '#2b6cb0', marginTop: '2px' }}>0.68 NDVI</div>
-                    <div style={{ fontSize: '0.78rem', color: '#718096' }}>Sentinel-2 Multi-Spectral</div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeFeatureTab === 'detection' && (
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
-                  <div>
-                    <h4 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#1a202c' }}>Edge AI YOLOv8 Classifier Console</h4>
-                    <p style={{ fontSize: '0.8rem', color: '#718096' }}>Upload camera trap snapshots or select 1-click wildlife presets</p>
-                  </div>
-                  <button onClick={() => onEnterDashboard('detection')} className="btn btn-primary btn-sm">
-                    <span>Open Detection Console</span>
-                    <ExternalLink size={13} />
-                  </button>
-                </div>
-
-                <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '8px', textAlign: 'center', border: '1px solid #e2e8f0' }}>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', marginBottom: '14px' }}>
-                    <span className="badge badge-active">🐅 Bengal Tiger</span>
-                    <span className="badge badge-acknowledged">🐘 Elephant Herd</span>
-                    <span className="badge badge-resolved">🐆 Indian Leopard</span>
-                    <span className="badge badge-pending">🐗 Wild Boar Sounder</span>
-                  </div>
-                  <p style={{ fontSize: '0.85rem', color: '#4a5568' }}>
-                    Instant neural bounding-box annotation and automated telemetry extraction.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {activeFeatureTab === 'map' && (
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
-                  <div>
-                    <h4 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#1a202c' }}>GIS Movement & Corridor Vectors</h4>
-                    <p style={{ fontSize: '0.8rem', color: '#718096' }}>Interactive map with migration corridors and safe zones</p>
-                  </div>
-                  <button onClick={() => onEnterDashboard('map')} className="btn btn-primary btn-sm">
-                    <span>Open GIS Map</span>
-                    <ExternalLink size={13} />
-                  </button>
-                </div>
-
-                <div style={{
-                  height: '200px',
-                  background: '#f8fafc',
-                  borderRadius: '8px',
-                  border: '1px dashed #cbd5e0',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexDirection: 'column',
-                  gap: '8px'
-                }}>
-                  <MapPin size={28} color="#48bb78" />
-                  <div style={{ fontWeight: '800', color: '#1a202c' }}>Western Ghats & Hassan Buffer Corridor Layer</div>
-                  <div style={{ fontSize: '0.78rem', color: '#718096' }}>Interactive GIS map with live animal pins and 15-min trajectory</div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </section>
 
-      {/* ─── FINAL CALL TO ACTION ─── */}
-      <section style={{
-        maxWidth: '1100px',
-        margin: '60px auto',
-        padding: '48px 24px',
-        textAlign: 'center',
-        background: '#edfdf5',
-        border: '1px solid #c6f6d5',
-        borderRadius: 'var(--radius-xl)'
-      }}>
-        <div className="category-tag">DEPLOY INTELLIGENCE</div>
-        <h2 style={{ fontSize: 'clamp(1.8rem, 3vw, 2.4rem)', fontWeight: '900', color: '#1a202c', marginBottom: '12px' }}>
-          Ready to bring early warning to your reserve corridor?
-        </h2>
-        <p style={{ color: '#4a5568', fontSize: '1rem', maxWidth: '560px', margin: '0 auto 24px' }}>
-          Experience zero-latency wildlife coexistence intelligence with YOLOv8 vision and Sentinel-2 satellite data.
-        </p>
-
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center' }}>
-          <button 
-            onClick={() => user ? onEnterDashboard() : onOpenAuth('signup')}
-            className="btn btn-primary"
-            style={{ padding: '13px 30px' }}
-          >
-            <span>Get Started</span>
-            <ArrowRight size={15} />
-          </button>
-          <button 
-            onClick={() => onOpenAuth('signin')}
-            className="btn btn-secondary"
-            style={{ padding: '13px 24px' }}
-          >
-            <span>Sign In</span>
-          </button>
-        </div>
-      </section>
-
-      {/* ─── CLEAN FOOTER ─── */}
+      {/* ─── FOOTER ─── */}
       <footer style={{
-        background: '#ffffff',
+        background: '#f8fafc',
         borderTop: '1px solid var(--border-subtle)',
-        padding: '48px 24px 32px',
+        padding: '40px 24px 24px',
         marginTop: 'auto'
       }}>
         <div style={{
-          maxWidth: '1300px',
+          maxWidth: '1280px',
           margin: '0 auto',
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '36px',
-          marginBottom: '36px'
+          gap: '32px',
+          marginBottom: '32px'
         }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-              <Eye size={20} color="#38a169" />
-              <span style={{ fontSize: '1.15rem', fontWeight: '900', color: '#1a202c' }}>Wildlife Insights</span>
+              <Shield size={20} color="#38a169" />
+              <span style={{ fontSize: '1.15rem', fontWeight: '900', color: '#1a202c' }}>WildGuard</span>
             </div>
             <p style={{ fontSize: '0.82rem', color: '#718096', lineHeight: 1.6 }}>
-              Human–Wildlife Coexistence & Early-Warning Platform.
+              Human–Wildlife Coexistence Platform for Forest Departments & Rural Communities.
             </p>
           </div>
 
           <div>
             <div style={{ fontSize: '0.78rem', fontWeight: '800', textTransform: 'uppercase', color: '#1a202c', marginBottom: '12px' }}>
-              Explore
+              Navigation
             </div>
             <ul style={{ listStyle: 'none', padding: 0, fontSize: '0.84rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <li><a href="#capabilities">Camera Traps</a></li>
-              <li><a href="#interactive-preview">AI Tagging</a></li>
-              <li><a href="#interactive-preview">GIS Corridors</a></li>
+              <li><a href="#overview" style={{ color: '#718096', textDecoration: 'none' }}>Overview</a></li>
+              <li><a href="#features" style={{ color: '#718096', textDecoration: 'none' }}>Capabilities</a></li>
             </ul>
           </div>
 
           <div>
             <div style={{ fontSize: '0.78rem', fontWeight: '800', textTransform: 'uppercase', color: '#1a202c', marginBottom: '12px' }}>
-              Technology
+              System APIs
             </div>
             <ul style={{ listStyle: 'none', padding: 0, fontSize: '0.84rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <li><span style={{ color: '#718096' }}>Ultralytics YOLOv8</span></li>
-              <li><span style={{ color: '#718096' }}>Sentinel-2 GIS</span></li>
-              <li><span style={{ color: '#718096' }}>Random Forest ML</span></li>
-            </ul>
-          </div>
-
-          <div>
-            <div style={{ fontSize: '0.78rem', fontWeight: '800', textTransform: 'uppercase', color: '#1a202c', marginBottom: '12px' }}>
-              API & Governance
-            </div>
-            <ul style={{ listStyle: 'none', padding: 0, fontSize: '0.84rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <li><a href="http://localhost:8000/docs" target="_blank" rel="noreferrer">FastAPI Swagger</a></li>
-              <li><span style={{ color: '#718096' }}>Karnataka Forest Dept</span></li>
+              <li><a href="http://localhost:8000/docs" target="_blank" rel="noreferrer" style={{ color: '#38a169', textDecoration: 'none' }}>FastAPI Swagger Docs</a></li>
             </ul>
           </div>
         </div>
 
         <div style={{
-          maxWidth: '1300px',
+          maxWidth: '1280px',
           margin: '0 auto',
           paddingTop: '20px',
-          borderTop: '1px solid #f1f5f9',
+          borderTop: '1px solid #e2e8f0',
           display: 'flex',
           flexWrap: 'wrap',
           alignItems: 'center',
           justifyContent: 'space-between',
           fontSize: '0.78rem',
-          color: '#a0aec0',
+          color: '#718096',
           gap: '12px'
         }}>
-          <div>© 2026 Wildlife Insights Coexistence Initiative. All rights reserved.</div>
+          <div>© 2026 WildGuard Coexistence Platform. All rights reserved.</div>
           <div style={{ display: 'flex', gap: '16px' }}>
             <span>Privacy Policy</span>
             <span>•</span>
-            <span>Terms of Use</span>
+            <span>Terms of Service</span>
           </div>
         </div>
       </footer>

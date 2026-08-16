@@ -163,15 +163,16 @@ export default function AuthPage({
             background: '#edfdf5',
             border: '1px solid #c6f6d5',
             display: 'inline-flex',
+            display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: '#38a169',
-            marginBottom: '10px'
+            margin: '0 auto 12px'
           }}>
             <EyeIcon size={24} />
           </div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '900', color: '#1a202c' }}>
-            {tab === 'signin' ? 'Sign In to Wildlife Insights' : 'Create an Account'}
+            {tab === 'signin' ? 'Sign In to WildGuard' : 'Create an Account'}
           </h2>
           <p style={{ fontSize: '0.85rem', color: '#718096', marginTop: '4px' }}>
             {tab === 'signin' 
@@ -207,7 +208,7 @@ export default function AuthPage({
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
             <button 
               type="button"
-              onClick={() => handleDemoLogin('officer@wildcare.demo', 'officer123')}
+              onClick={() => handleDemoLogin('officer@wildguard.org', 'officer123')}
               className="btn btn-secondary btn-sm"
               style={{ flexDirection: 'column', padding: '8px 4px', textAlign: 'center', background: '#ffffff' }}
             >
@@ -218,7 +219,7 @@ export default function AuthPage({
 
             <button 
               type="button"
-              onClick={() => handleDemoLogin('citizen@wildcare.demo', 'citizen123')}
+              onClick={() => handleDemoLogin('citizen@wildguard.org', 'citizen123')}
               className="btn btn-secondary btn-sm"
               style={{ flexDirection: 'column', padding: '8px 4px', textAlign: 'center', background: '#ffffff' }}
             >
@@ -229,7 +230,7 @@ export default function AuthPage({
 
             <button 
               type="button"
-              onClick={() => handleDemoLogin('admin@wildcare.demo', 'admin123')}
+              onClick={() => handleDemoLogin('admin@wildguard.org', 'admin123')}
               className="btn btn-secondary btn-sm"
               style={{ flexDirection: 'column', padding: '8px 4px', textAlign: 'center', background: '#ffffff' }}
             >

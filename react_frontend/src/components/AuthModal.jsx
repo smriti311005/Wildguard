@@ -120,10 +120,10 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, currentUser 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
           <div>
-            <h3 style={{ fontSize: '1.3rem', fontWeight: '900', color: '#ffffff' }}>
-              {isAdmin ? 'System Administration & User Roles' : (tab === 'signin' ? 'Sign In to WildCare' : 'Create New WildCare Account')}
+            <h3 style={{ fontSize: '1.3rem', fontWeight: '900', color: '#1a202c' }}>
+              {isAdmin ? 'System Administration & User Roles' : (tab === 'signin' ? 'Sign In to WildGuard' : 'Create New WildGuard Account')}
             </h3>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            <p style={{ fontSize: '0.8rem', color: '#718096' }}>
               {isAdmin ? 'Manage department personnel & verify officer credentials' : 'Role-based access for Citizens, Forest Officers & Administrators'}
             </p>
           </div>
@@ -132,7 +132,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, currentUser 
             style={{
               background: 'transparent',
               border: 'none',
-              color: 'var(--text-muted)',
+              color: '#718096',
               cursor: 'pointer',
               padding: '6px'
             }}
@@ -144,47 +144,47 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, currentUser 
         {/* ─── 1-CLICK DEMO ACCOUNTS ─── */}
         {!isAdmin && (
           <div style={{
-            background: 'rgba(6, 20, 12, 0.9)',
-            border: '1px solid var(--border-medium)',
+            background: '#f8fafc',
+            border: '1px solid #e2e8f0',
             borderRadius: 'var(--radius-md)',
             padding: '16px',
             marginBottom: '20px'
           }}>
-            <div style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: '#4ade80', marginBottom: '10px' }}>
+            <div style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: '#276749', marginBottom: '10px' }}>
               ⚡ 1-Click Instant Demo Logins
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
               <button 
                 type="button"
-                onClick={() => handleDemoLogin('officer@wildcare.demo', 'officer123')}
+                onClick={() => handleDemoLogin('officer@wildguard.org', 'officer123')}
                 className="btn btn-secondary btn-sm"
                 style={{ flexDirection: 'column', padding: '10px 6px', fontSize: '0.75rem', textAlign: 'center' }}
               >
                 <span style={{ fontSize: '1.1rem' }}>🛡️</span>
-                <span style={{ fontWeight: '800', marginTop: '2px' }}>Forest Officer</span>
-                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Range Officer</span>
+                <span style={{ fontWeight: '800', marginTop: '2px', color: '#1a202c' }}>Forest Officer</span>
+                <span style={{ fontSize: '0.65rem', color: '#718096' }}>Range Officer</span>
               </button>
 
               <button 
                 type="button"
-                onClick={() => handleDemoLogin('citizen@wildcare.demo', 'citizen123')}
+                onClick={() => handleDemoLogin('citizen@wildguard.org', 'citizen123')}
                 className="btn btn-secondary btn-sm"
                 style={{ flexDirection: 'column', padding: '10px 6px', fontSize: '0.75rem', textAlign: 'center' }}
               >
                 <span style={{ fontSize: '1.1rem' }}>🌾</span>
-                <span style={{ fontWeight: '800', marginTop: '2px' }}>Rural Citizen</span>
-                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Belur Village</span>
+                <span style={{ fontWeight: '800', marginTop: '2px', color: '#1a202c' }}>Rural Citizen</span>
+                <span style={{ fontSize: '0.65rem', color: '#718096' }}>Belur Village</span>
               </button>
 
               <button 
                 type="button"
-                onClick={() => handleDemoLogin('admin@wildcare.demo', 'admin123')}
+                onClick={() => handleDemoLogin('admin@wildguard.org', 'admin123')}
                 className="btn btn-secondary btn-sm"
                 style={{ flexDirection: 'column', padding: '10px 6px', fontSize: '0.75rem', textAlign: 'center' }}
               >
                 <span style={{ fontSize: '1.1rem' }}>⚡</span>
-                <span style={{ fontWeight: '800', marginTop: '2px' }}>SysAdmin</span>
-                <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>Full Access</span>
+                <span style={{ fontWeight: '800', marginTop: '2px', color: '#1a202c' }}>SysAdmin</span>
+                <span style={{ fontSize: '0.65rem', color: '#718096' }}>Full Access</span>
               </button>
             </div>
           </div>

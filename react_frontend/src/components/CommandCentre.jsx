@@ -71,29 +71,29 @@ export default function CommandCentre({
       }}>
         <div>
           <div className="category-tag">
-            AI-POWERED WILDLIFE CONFLICT MITIGATION
+            REAL-TIME WILDLIFE CONFLICT MITIGATION
           </div>
 
           <h1 style={{
-            fontSize: 'clamp(1.9rem, 3.2vw, 2.8rem)',
+            fontSize: 'clamp(1.8rem, 3vw, 2.6rem)',
             fontWeight: '900',
-            lineHeight: 1.12,
+            lineHeight: 1.15,
             marginBottom: '12px',
             color: '#1a202c'
           }}>
-            See movement early.<br />
-            <span style={{ color: '#48bb78' }}>Protect people and wildlife.</span>
+            Detect movement early.<br />
+            <span style={{ color: '#38a169' }}>Protect people and wildlife.</span>
           </h1>
 
           <p style={{
             color: '#4a5568',
-            fontSize: '1.02rem',
+            fontSize: '1rem',
             maxWidth: '680px',
             marginBottom: '24px',
             lineHeight: 1.6
           }}>
-            Unified early-warning system combining Edge YOLOv8 vision, Sentinel-2 GIS habitat telemetry,
-            and predictive animal movement vectors for Hassan reserve corridors and surrounding villages.
+            Early-warning platform combining camera trap vision, satellite habitat mapping,
+            and predictive animal movement vectors for forest corridors and agricultural boundaries.
           </p>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
