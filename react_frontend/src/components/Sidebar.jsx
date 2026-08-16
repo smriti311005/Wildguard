@@ -103,7 +103,7 @@ export default function Sidebar({
                   lineHeight: 1.1,
                   color: '#1a202c'
                 }}>
-                  Wildlife <span style={{ color: '#48bb78' }}>Insights</span>
+                  Wild<span style={{ color: '#48bb78' }}>Guard</span>
                 </div>
                 <div style={{
                   fontSize: '0.6rem',

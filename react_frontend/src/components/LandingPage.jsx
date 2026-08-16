@@ -74,7 +74,7 @@ export default function LandingPage({
                 lineHeight: 1.1,
                 color: '#1a202c'
               }}>
-                Wildlife <span style={{ color: '#48bb78' }}>Insights</span>
+                Wild<span style={{ color: '#48bb78' }}>Guard</span>
               </div>
             </div>
           </div>
@@ -592,7 +592,7 @@ export default function LandingPage({
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <Eye size={20} color="#38a169" />
-              <span style={{ fontSize: '1.15rem', fontWeight: '900', color: '#1a202c' }}>Wildlife Insights</span>
+              <span style={{ fontSize: '1.15rem', fontWeight: '900', color: '#1a202c' }}>WildGuard</span>
             </div>
             <p style={{ fontSize: '0.82rem', color: '#718096', lineHeight: 1.6 }}>
               Human–Wildlife Coexistence & Early-Warning Platform.
@@ -645,7 +645,7 @@ export default function LandingPage({
           color: '#a0aec0',
           gap: '12px'
         }}>
-          <div>© 2026 Wildlife Insights Coexistence Initiative. All rights reserved.</div>
+          <div>© 2026 WildGuard Coexistence Initiative. All rights reserved.</div>
           <div style={{ display: 'flex', gap: '16px' }}>
             <span>Privacy Policy</span>
             <span>•</span>

@@ -305,7 +305,7 @@ export default function App() {
           gap: '14px'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span>🌿 <b>Wildlife Insights Operations Console</b></span>
+            <span>🌿 <b>WildGuard Operations Console</b></span>
             <span>•</span>
             <span>Active Role: <b style={{ color: '#276749' }}>{user?.role || 'GUEST'}</b></span>
           </div>
