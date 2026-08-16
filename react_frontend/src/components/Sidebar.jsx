@@ -14,7 +14,7 @@ import {
   Volume2, 
   VolumeX, 
   X,
-  Shield
+  Eye
 } from 'lucide-react';
 import { getAuthorizedTabs, ROLES } from '../rbac';
 
@@ -66,7 +66,7 @@ export default function Sidebar({
         
         {/* ─── 1. TOP BRAND HEADER ─── */}
         <div style={{
-          padding: '22px 20px 18px',
+          padding: '24px 20px 20px',
           borderBottom: '1px solid var(--border-subtle)',
           display: 'flex',
           flexDirection: 'column',
@@ -77,9 +77,9 @@ export default function Sidebar({
             <div 
               onClick={onGoHome}
               style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
-              title="Return to WildGuard Home"
+              title="Return to Public Landing Page"
             >
-              {/* WildGuard Shield Icon */}
+              {/* Wildlife Insights styled eye/shield icon */}
               <div style={{
                 width: '36px',
                 height: '36px',
@@ -92,7 +92,7 @@ export default function Sidebar({
                 color: '#38a169',
                 flexShrink: 0
               }}>
-                <Shield size={22} color="#38a169" />
+                <Eye size={22} color="#38a169" />
               </div>
               <div>
                 <div style={{
@@ -103,12 +103,12 @@ export default function Sidebar({
                   lineHeight: 1.1,
                   color: '#1a202c'
                 }}>
-                  Wild<span style={{ color: '#38a169' }}>Guard</span>
+                  Wildlife <span style={{ color: '#48bb78' }}>Insights</span>
                 </div>
                 <div style={{
-                  fontSize: '0.62rem',
+                  fontSize: '0.6rem',
                   fontWeight: '800',
-                  letterSpacing: '0.8px',
+                  letterSpacing: '1px',
                   textTransform: 'uppercase',
                   color: '#718096'
                 }}>
@@ -145,7 +145,7 @@ export default function Sidebar({
             borderRadius: '999px',
             width: 'fit-content'
           }}>
-            <span className="live-dot"></span>
+            <span className="pulse-beacon"></span>
             <span style={{
               fontSize: '0.7rem',
               fontWeight: '800',
@@ -153,7 +153,7 @@ export default function Sidebar({
               textTransform: 'uppercase',
               color: '#276749'
             }}>
-              {onlineNodesCount} SENSORS ONLINE
+              {onlineNodesCount} NODES ONLINE
             </span>
           </div>
         </div>
@@ -175,7 +175,7 @@ export default function Sidebar({
             color: '#a0aec0',
             padding: '4px 10px 8px'
           }}>
-            MAIN MENU
+            MODULES
           </div>
 
           {authorizedTabs.map((item) => {
@@ -199,7 +199,7 @@ export default function Sidebar({
                     width: '6px',
                     height: '6px',
                     borderRadius: '50%',
-                    background: '#38a169'
+                    background: '#48bb78'
                   }} />
                 )}
               </button>
@@ -207,83 +207,106 @@ export default function Sidebar({
           })}
         </div>
 
-        {/* ─── 3. USER PROFILE & FOOTER CONTROL ─── */}
+        {/* ─── 3. BOTTOM USER PROFILE & QUICK ACTIONS ─── */}
         <div style={{
-          padding: '16px',
+          padding: '14px',
           borderTop: '1px solid var(--border-subtle)',
+          background: '#f8fafc',
           display: 'flex',
           flexDirection: 'column',
-          gap: '12px',
-          background: '#ffffff'
+          gap: '10px'
         }}>
+          {/* User Info Card */}
           {user && (
             <div style={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: '10px 12px',
-              background: '#f8fafc',
-              border: '1px solid #e2e8f0',
-              borderRadius: 'var(--radius-md)'
+              background: '#ffffff',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--radius-md)',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
             }}>
-              <div style={{ overflow: 'hidden' }}>
-                <div style={{ fontWeight: '800', fontSize: '0.84rem', color: '#1a202c', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {user.name}
-                </div>
-                <div style={{ fontSize: '0.7rem', color: '#718096', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span style={{
-                    width: '6px',
-                    height: '6px',
-                    borderRadius: '50%',
-                    background: user.role === 'ADMIN' ? '#7e22ce' : (user.role === 'FOREST_OFFICER' ? '#38a169' : '#3182ce')
-                  }}></span>
-                  <span>{user.role.replace('_', ' ')}</span>
-                </div>
-              </div>
-
-              {/* Siren Audio Alarm Toggle */}
-              <button
-                onClick={() => setIsAudioAlertEnabled(!isAudioAlertEnabled)}
-                title={isAudioAlertEnabled ? "Audio Sirens Enabled" : "Audio Sirens Muted"}
-                style={{
-                  background: isAudioAlertEnabled ? '#edfdf5' : '#f1f5f9',
-                  border: `1px solid ${isAudioAlertEnabled ? '#9ae6b4' : '#cbd5e1'}`,
-                  color: isAudioAlertEnabled ? '#276749' : '#718096',
-                  borderRadius: '8px',
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                <div style={{
                   width: '32px',
                   height: '32px',
+                  borderRadius: '6px',
+                  background: role === 'ADMIN' ? '#f3e8ff' : (role === 'CITIZEN' ? '#ecfdf5' : '#fffbeb'),
+                  border: `1px solid ${role === 'ADMIN' ? '#d8b4fe' : (role === 'CITIZEN' ? '#a7f3d0' : '#fde68a')}`,
+                  color: role === 'ADMIN' ? '#7e22ce' : (role === 'CITIZEN' ? '#065f46' : '#92400e'),
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  cursor: 'pointer'
+                  fontSize: '0.85rem',
+                  fontWeight: '900',
+                  flexShrink: 0
+                }}>
+                  {role === 'ADMIN' ? '⚡' : (role === 'CITIZEN' ? '🌾' : '🛡️')}
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{
+                    fontWeight: '800',
+                    fontSize: '0.82rem',
+                    color: '#1a202c',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}>
+                    {user.name}
+                  </div>
+                  <div style={{ fontSize: '0.68rem', color: '#718096' }}>
+                    {role.replace('_', ' ')}
+                  </div>
+                </div>
+              </div>
+
+              {/* Audio toggle button inside user card */}
+              <button
+                onClick={() => setIsAudioAlertEnabled(!isAudioAlertEnabled)}
+                title={isAudioAlertEnabled ? "Mute alert audio" : "Enable alert audio"}
+                style={{
+                  background: isAudioAlertEnabled ? '#fee2e2' : '#f1f5f9',
+                  border: `1px solid ${isAudioAlertEnabled ? '#fca5a5' : '#e2e8f0'}`,
+                  color: isAudioAlertEnabled ? '#dc2626' : '#64748b',
+                  borderRadius: '6px',
+                  padding: '6px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.2s ease',
+                  flexShrink: 0
                 }}
               >
-                {isAudioAlertEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                {isAudioAlertEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
               </button>
             </div>
           )}
 
-          {/* Landing Page Button */}
-          <button
-            onClick={onGoHome}
-            className="btn btn-secondary btn-sm"
-            style={{ width: '100%', justifyContent: 'flex-start', padding: '8px 12px' }}
-          >
-            <Home size={15} />
-            <span>Public Landing Page</span>
-          </button>
+          {/* Quick Footer Links */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+            <button 
+              onClick={onGoHome}
+              className="btn btn-secondary btn-sm"
+              style={{ padding: '7px 10px', fontSize: '0.76rem' }}
+              title="Return to Public Landing Page"
+            >
+              <Home size={13} />
+              <span>Landing</span>
+            </button>
 
-          {/* Logout Button */}
-          {user && (
-            <button
+            <button 
               onClick={onLogout}
               className="btn btn-secondary btn-sm"
-              style={{ width: '100%', justifyContent: 'flex-start', color: '#e53e3e', borderColor: '#feb2b2', padding: '8px 12px' }}
+              style={{ padding: '7px 10px', fontSize: '0.76rem', color: '#dc2626' }}
+              title="Sign out of account"
             >
-              <LogOut size={15} />
+              <LogOut size={13} />
               <span>Sign Out</span>
             </button>
-          )}
+          </div>
         </div>
 
       </aside>

@@ -26,13 +26,13 @@ export default function TopBar({
   setIsAudioAlertEnabled 
 }) {
   const tabTitles = {
-    command: { title: 'Real-Time Operations', subtitle: 'Live telemetry, movement risks, and immediate field alerts', icon: Compass },
-    detection: { title: 'Camera Trap Identification', subtitle: 'AI species classification, demo presets, and image uploads', icon: Camera },
-    map: { title: 'Wildlife Movement Map', subtitle: 'Interactive migration paths, active corridors, and 15-min trajectory vectors', icon: MapIcon },
-    community: { title: 'Community Wildlife Sightings', subtitle: 'Crowdsourced citizen reports and Range Officer verification queue', icon: Users },
-    citizen: { title: 'Citizen Safety Portal', subtitle: 'Local village threat status, instant reports, and emergency helplines', icon: HeartHandshake },
-    analytics: { title: 'Analytics & Incident Logs', subtitle: 'Species detection trends, 24-hr activity histogram, and CSV export', icon: BarChart3 },
-    admin: { title: 'System & Sensor Fleet Settings', subtitle: 'User role approvals, edge node diagnostics, and system settings', icon: ShieldCheck }
+    command: { title: 'Tactical Command Centre', subtitle: 'Real-time telemetry, 6-factor risk assessment, and live alerts', icon: Compass },
+    detection: { title: 'Edge AI Detection Console', subtitle: 'On-device YOLOv8 neural inference, presets & manual uploads', icon: Camera },
+    map: { title: 'GIS Movement & Corridor Map', subtitle: 'Interactive migration paths, safe zones, and 15-min trajectory vectors', icon: MapIcon },
+    community: { title: 'Community Sighting Reports', subtitle: 'Crowdsourced citizen reports & Range Officer verification queue', icon: Users },
+    citizen: { title: 'Citizen Safety & Advisory Portal', subtitle: 'Mobile-first village threat status, 1-tap reports, and emergency helplines', icon: HeartHandshake },
+    analytics: { title: 'Analytics & Incident Telemetry Logs', subtitle: 'Species frequency charts, 24-hr activity histogram, and CSV export', icon: BarChart3 },
+    admin: { title: 'System Administration & Fleet Health', subtitle: 'User role approvals, sensor diagnostics, and audit logs', icon: ShieldCheck }
   };
 
   const currentMeta = tabTitles[currentTab] || tabTitles.command;
@@ -45,17 +45,16 @@ export default function TopBar({
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      padding: '14px 20px',
+      padding: '16px 24px',
       background: '#ffffff',
       border: '1px solid var(--border-subtle)',
       borderRadius: 'var(--radius-lg)',
       boxShadow: 'var(--shadow-sm)',
-      marginBottom: '20px',
-      gap: '16px',
-      flexWrap: 'wrap'
+      marginBottom: '24px',
+      gap: '16px'
     }}>
       {/* Left: Mobile Toggle & Breadcrumb Title */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
         <button
           onClick={onToggleMobileSidebar}
           className="mobile-sidebar-toggle-btn"
@@ -88,51 +87,48 @@ export default function TopBar({
           <TabIcon size={18} />
         </div>
 
-        <div style={{ minWidth: 0 }}>
-          <div className="category-tag" style={{ marginBottom: '2px', fontSize: '0.65rem' }}>
-            WILDGUARD // {currentTab.toUpperCase()}
+        <div>
+          <div className="category-tag" style={{ marginBottom: '2px', fontSize: '0.68rem' }}>
+            MODULE // {currentTab.toUpperCase()}
           </div>
           <h2 style={{
-            fontSize: '1.15rem',
+            fontSize: '1.2rem',
             fontWeight: '900',
             color: '#1a202c',
-            lineHeight: 1.15,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
+            lineHeight: 1.15
           }}>
             {currentMeta.title}
           </h2>
         </div>
       </div>
 
-      {/* Right Actions: Active Alerts Counter & Home Shortcut */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-        {/* Active Threat Counter */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          padding: '6px 12px',
-          background: activeAlertCount > 0 ? '#fff5f5' : '#edfdf5',
-          border: `1px solid ${activeAlertCount > 0 ? '#feb2b2' : '#c6f6d5'}`,
-          borderRadius: 'var(--radius-full)',
-          fontSize: '0.78rem',
-          fontWeight: '800',
-          color: activeAlertCount > 0 ? '#c53030' : '#276749'
-        }}>
-          <ShieldAlert size={14} color={activeAlertCount > 0 ? "#e53e3e" : "#38a169"} />
-          <span>{activeAlertCount} ACTIVE INCIDENTS</span>
-        </div>
+      {/* Right: Active Alert Ticker & Landing Button */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {activeAlertCount > 0 && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '6px 14px',
+            background: '#fff5f5',
+            border: '1px solid #feb2b2',
+            borderRadius: '999px',
+            color: '#c53030',
+            fontSize: '0.75rem',
+            fontWeight: '800'
+          }}>
+            <Bell size={13} className="animate-pulse" />
+            <span>{activeAlertCount} ACTIVE INCIDENT{activeAlertCount > 1 ? 'S' : ''}</span>
+          </div>
+        )}
 
-        {/* Return to Home Button */}
-        <button
+        <button 
           onClick={onGoHome}
           className="btn btn-secondary btn-sm"
-          style={{ padding: '6px 12px' }}
+          style={{ padding: '7px 14px', fontSize: '0.78rem' }}
         >
           <Home size={14} />
-          <span style={{ display: 'inline' }}>Public Page</span>
+          <span>Public Landing</span>
         </button>
       </div>
     </div>
